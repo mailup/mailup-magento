@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<layout>
+    
+    <mailup_adminhtml_mailupbackend_index>
+        <reference name="content">
+    <!--	  <block type="mailup/adminhtml_mailupbackend" name="mailupbackend" template="mailup/mailupbackend.phtml"/>-->
+
+            <block type="mailup/adminhtml_mailupbackend" name="mailupbackend" />
+        </reference>
+    </mailup_adminhtml_mailupbackend_index>
+    
+    <mailup_adminhtml_sync_index>
+        <reference name="content">
+            <block type="mailup/adminhtml_sync" name="sync" />
+        </reference>
+    </mailup_adminhtml_sync_index>
+    
+    <mailup_adminhtml_log_index>
+        <reference name="content">
+            <block type="mailup/adminhtml_log" name="mailup_log" />
+        </reference>
+    </mailup_adminhtml_log_index>
+    
+    <mailup_adminhtml_filter_index>
+        <update handle="mailup_adminhtml_index"/>
+        <reference name="content">
+            <block type="mailup/filters" name="filter" template="mailup/mailupsync/filter.phtml"/>
+        </reference>
+        <reference name="head">
+            <action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
+        </reference>
+    </mailup_adminhtml_filter_index>
+    
+    <mailup_adminhtml_filter_confirm>
+        <update handle="mailup_adminhtml_confirm"/>
+        <reference name="content">
+            <block type="adminhtml/template" name="filter" template="mailup/mailupsync/confirm.phtml"/>
+        </reference>
+        <reference name="head">
+            <action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
+        </reference>
+    </mailup_adminhtml_filter_confirm>
+    
+    <mailup_adminhtml_fieldsmapping_index>
+        <update handle="mailup_adminhtml_index" />
+        <reference name="content">
+            <block type="adminhtml/template" name="fieldsmapping" template="mailup/mailupsync/fieldsmapping.phtml" />
+        </reference>
+        <reference name="head">
+            <action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
+        </reference>
+    </mailup_adminhtml_fieldsmapping_index>
+    
+	<mailup_adminhtml_viewdatatransferlog_index>
+		<update handle="mailup_adminhtml_index" />
+		<reference name="content">
+			<block type="adminhtml/template" name="viewdatatransferlog" template="mailup/mailupsync/viewdatatransferlog.phtml" />
+		</reference>
+		<reference name="head">
+			<action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
+		</reference>
+	</mailup_adminhtml_viewdatatransferlog_index>
+    
+	<mailup_adminhtml_viewdatatransferlog_search>
+		<update handle="mailup_adminhtml_index" />
+		<reference name="content">
+			<block type="adminhtml/template" name="viewdatatransferlog" template="mailup/mailupsync/viewdatatransferlog.phtml" />
+		</reference>
+		<reference name="head">
+			<action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
+		</reference>
+	</mailup_adminhtml_viewdatatransferlog_search>
+
+    <adminhtml_system_config_edit>
+        <reference name="head">
+            <action method="addJs"><stylesheet>mailup/admin.js</stylesheet></action>
+        </reference>
+        <reference name="content">
+            <block type="adminhtml/template" name="mailupsysconfigjavascript" template="mailup/mailupsync/sysconfigjavascript.phtml" />
+        </reference>
+    </adminhtml_system_config_edit>
+
+    
+    <!-- works but need a better image.. -->
+    <!--<default>
+        <reference name="head">
+			<action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
+		</reference>
+    </default>-->
+    
+</layout>

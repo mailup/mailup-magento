@@ -1,0 +1,61 @@
+<?php
+/**
+ * @depreciated
+ */
+$allmagentofields = array(
+    "Name", "Last", "Email", "Company", "Address", "City", "ZIP", "Province", "Region", "Country", "Gender", "DateOfBirth", "CustomerID", 
+    "Phone", "Fax", "LatestOrderID", "LatestOrderDate", "LatestOrderAmount", "LatestOrderProductIDs", "LatestOrderCategoryIDs", 
+    "LatestShippedOrderDate", "LatestShippedOrderID", "LatestAbandonedCartDate", "LatestAbandonedCartTotal", 
+    "LatestAbandonedCartID", "TotalOrdered", "TotalOrderedLast12m", "TotalOrderedLast30d", "AllOrderedProductIDs"
+);
+$wsSend = new MailUpWsSend();
+$accessKey = $wsSend->loginFromId();
+
+if ($accessKey === false) {
+    echo $this->__('WARNING: before proceeding you must correctly configure the settings of MailUp access in System->Configuration->Newsletter->MailUp');
+} else {
+    $wsImport = new MailUpWsImport();
+	
+	$wsSend = new MailUpWsSend();
+	// campi che arrivano da mailup
+	$wsFields = $wsSend->getFields($accessKey);
+    //carico i mapping salvati
+    $fields = $wsImport->getFieldsMapping();
+?>
+    <div class="content-header">
+        <table cellspacing="0" class="grid-header">
+            <tr>
+                <td>
+                    <h3><?php echo $this->__('Fields mapping')?></h3>
+                </td>
+                <td class="a-right">
+                    <button onclick="document.forms.saveFieldsMappingForm.submit()" class="scalable save" type="button"><span><?php echo $this->__('Save configuration')?></span></button>
+                </td>
+            </tr>
+        </table>
+    </div>
+<p><?php echo $this->__('Associate all Magento fields with MailUp ones') ?></p>
+<p>&nbsp;</p>
+<div style="font-weight:bold">
+	<div style="display:block;float:left;width:180px"><?php echo $this->__("Magento fields") ?></div>
+	<div><?php echo $this->__("Mailup fields") ?></div>
+</div>
+<form name="saveFieldsMappingForm" method="post" action="<?php echo $this->getUrl('*/*/save')?>">
+	<input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+	<?php foreach ($allmagentofields as $magentofield): ?>
+		<div>
+			<label for="sl_<?php echo $magentofield ?>" style="display:block;float:left;width:180px;"><?php echo $magentofield ?></label>
+			<select name="<?php echo $magentofield ?>" id="sl_<?php echo $magentofield ?>">
+			<option value=""></option>
+			<?php
+				foreach ($wsFields as $nome=>$id) {
+					$selected = ($id == $fields[$magentofield]) ? "selected='selected'" : "";
+					$nome = htmlspecialchars($nome);
+					echo "<option value='$id' $selected>$nome</option>";
+				}
+				echo '</select>';
+			?>
+		</div>
+	<?php endforeach; ?>
+</form>
+<?php } ?>

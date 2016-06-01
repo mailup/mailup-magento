@@ -1,0 +1,39 @@
+<?php
+$storeId = Mage::app()->getStore()->getStoreId();
+$display_checkbox = false;
+if (Mage::getStoreConfig("mailup_newsletter/mailup/enable_subscribe_in_checkout", $storeId) == 1) {
+	if (Mage::helper('customer')->isLoggedIn()) {
+		$email = Mage::helper('customer')->getCustomer()->getEmail();
+		$newsletter_subscriber_model = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
+		if ($newsletter_subscriber_model->getSubscriberStatus() != 1) {
+			$display_checkbox = true;
+		}
+	} else {
+		$display_checkbox = true;
+	}
+}
+
+?>
+
+<?php if ($display_checkbox): ?>
+	<div class="buttons-set">
+		<label>
+			<input type="checkbox" onchange="mailupModifyPost()" name="mailup_subscribe" id="mailup_subscribe" value="1" title="<?php echo $this->htmlEscape($this->__('Sign Up for Newsletter')) ?>" checked="checked" />
+			<?php echo $this->htmlEscape($this->__('Sign Up for Newsletter')) ?>
+		</label>
+	</div>
+    <script type="text/javascript">
+        mailupModifyPost = function () {
+            if ($('mailup_subscribe2')) $('mailup_subscribe2').remove();
+            if ($('mailup_subscribe').checked) {
+                var newinput = new Element("input", {name: "mailup_subscribe2", id: "mailup_subscribe2", value: "1", type: "hidden"});
+                try {
+                    Element.insert(Form.findFirstElement(payment.form), newinput);
+                } catch (e) {
+                    $("co-payment-form").insert(newinput);
+                }
+            }
+        }
+        mailupModifyPost();
+    </script>
+<?php endif; ?>

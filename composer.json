@@ -1,0 +1,20 @@
+{
+  "name": "mailup/magento",
+  "type": "magento-module",
+  "license": "AFL",
+  "homepage": "https://github.com/mailup/mailup-magento",
+  "description": "Magento 1.x CE Module for MailUp Integration",
+  "authors": [
+    {
+      "name": "MailUp",
+      "email": "support@mailup.com"
+    },
+    {
+      "name": "Internet.sm",
+      "email": "tech@internetsm.com"
+    }
+  ],
+  "require": {
+    "magento-hackathon/magento-composer-installer": "*"
+  }
+}

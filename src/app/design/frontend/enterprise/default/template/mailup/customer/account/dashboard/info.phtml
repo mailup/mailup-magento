@@ -1,0 +1,33 @@
+<div class="col2-set">
+    <div class="col-1">
+        <div class="info-box">
+            <h3 class="box-title"><?php echo $this->__('Contact Information') ?> <span class="separator">|</span> <a href="<?php echo $this->getUrl('customer/account/edit') ?>"><?php echo $this->__('Edit') ?></a></h3>
+            <p class="box-content">
+                <?php echo $this->escapeHtml($this->getCustomer()->getName()) ?><br />
+                <?php echo $this->escapeHtml($this->getCustomer()->getEmail()) ?><br />
+                <a href="<?php echo $this->getChangePasswordUrl() ?>"><?php echo $this->__('Change Password') ?></a>
+            </p>
+        </div>
+    </div>
+    <?php if( $this->isNewsletterEnabled() ): ?>
+        <div class="col-2">
+            <div class="info-box">
+                <h3 class="box-title"><?php echo $this->__('Newsletters') ?> <span class="separator">|</span> <a href="<?php echo $this->getUrl('newsletter/manage') ?>"><?php echo $this->__('Edit') ?></a></h3>
+                <p class="box-content">
+                    <?php /** @modification: Checks for subscription status, not just whether subscribed */
+                    switch( $this->getSubscriptionObject()->getStatus() ) {
+                        case Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED:
+                            echo $this->__('You are currently subscribed to "General Subscription"'); break;
+                        case Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED:
+                            echo Mage::helper("mailup")->__('Check your email to confirm your subscription to our newsletter.'); break;
+                        default:
+                            echo $this->__('You are currently not subscribed to any newsletter.');
+                    }
+                    ?>
+                </p>
+            </div>
+            <?php /* Extensions placeholder */ ?>
+            <?php echo $this->getChildHtml('customer.account.dashboard.info.extra')?>
+        </div>
+    <?php endif; ?>
+</div>

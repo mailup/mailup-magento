@@ -1,0 +1,359 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <MailUp_MailUpSync>
+            <version>2.7.2</version>
+        </MailUp_MailUpSync>
+    </modules>
+<!-- frontend -->
+	<frontend>
+        <routers>
+            <mailup>
+                <use>standard</use>
+                <args>
+                    <module>MailUp_MailUpSync</module>
+                    <frontName>mailup</frontName>
+                </args>
+            </mailup>
+        </routers>
+		<translate>
+			<modules>
+				<mailup>
+					<files>
+						<default>MailUp_MailUpSync.csv</default>
+					</files>
+				</mailup>
+			</modules>
+		</translate>
+		<layout>
+			<updates>
+				<mailup>
+					<file>mailup.xml</file>
+				</mailup>
+			</updates>
+		</layout>
+	</frontend>
+<!-- global -->
+    <global>
+<!-- models -->
+        <models>
+            <mailup>
+                <class>MailUp_MailUpSync_Model</class>
+                <resourceModel>mailup_mysql4</resourceModel>
+            </mailup>
+            <mailup_mysql4>
+                <class>MailUp_MailUpSync_Model_Mysql4</class>
+                <entities>
+                    <job>
+                        <table>mailup_sync_jobs</table>
+                    </job>
+                     <sync>
+                        <table>mailup_sync</table>
+                    </sync>
+                    <log>
+                        <table>mailup_log</table>
+                    </log>
+                </entities>
+            </mailup_mysql4>
+            <!-- Override Subscriber so we can disable Notifiactions -->
+            <newsletter>
+				<rewrite>
+					<subscriber>MailUp_MailUpSync_Model_Subscriber</subscriber>
+				</rewrite>
+			</newsletter>
+        </models>
+<!-- blocks -->
+        <blocks>
+            <mailup>
+                <class>MailUp_MailUpSync_Block</class>
+            </mailup>
+        </blocks>
+        <helpers>
+            <mailup>
+                <class>MailUp_MailUpSync_Helper</class>
+            </mailup>
+        </helpers>
+<!-- resources -->
+        <resources>
+            <mailup_setup>
+                <setup>
+                    <module>MailUp_MailUpSync</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </mailup_setup>
+            <mailup_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </mailup_write>
+            <mailup_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </mailup_read>
+        </resources>
+<!-- events -->
+		<events>
+            <newsletter_subscriber_save_before>
+                <observers>
+                    <mailup_observer>
+                        <type>singleton</type>
+                        <class>MailUp_MailUpSync_Model_Observer</class>
+                        <method>beforeSave</method>
+                    </mailup_observer>
+                </observers>
+            </newsletter_subscriber_save_before>
+			<newsletter_subscriber_save_after>
+				<observers>
+					<mailupsenduser_observer>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>sendUser</method>
+					</mailupsenduser_observer>
+				</observers>
+			</newsletter_subscriber_save_after>
+			<customer_customer_authenticated>
+				<observers>
+					<mailupleggiutente_observer>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>leggiUtente</method>
+					</mailupleggiutente_observer>
+				</observers>
+			</customer_customer_authenticated>
+			<controller_action_postdispatch_adminhtml_system_config_save>
+				<observers>
+					<mailupconfigsave_observer>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>saveSystemConfig</method>
+					</mailupconfigsave_observer>
+				</observers>
+			</controller_action_postdispatch_adminhtml_system_config_save>
+			<admin_session_user_login_success>
+				<observers>
+					<mailupconfigtest_observer>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>configCheck</method>
+					</mailupconfigtest_observer>
+				</observers>
+			</admin_session_user_login_success>
+			<controller_action_postdispatch_checkout_onepage_saveOrder>
+				<observers>
+					<mailup_subscribe_during_checkout>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>onCheckoutSaveOrder</method>
+					</mailup_subscribe_during_checkout>
+				</observers>
+			</controller_action_postdispatch_checkout_onepage_saveOrder>
+            <controller_action_postdispatch_checkout_multishipping_saveOrder>
+                <observers>
+                    <mailup_checkout_order_save>
+                        <type>singleton</type>
+                        <class>MailUp_MailUpSync_Model_Observer</class>
+                        <method>onCheckoutSaveOrder</method>
+                    </mailup_checkout_order_save>
+                </observers>
+            </controller_action_postdispatch_checkout_multishipping_saveOrder>
+			<customer_save_after>
+				<observers>
+					<mailup_checkout_order_save>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>prepareCustomerForDataSync</method>
+					</mailup_checkout_order_save>
+				</observers>
+			</customer_save_after>
+			<sales_order_save_after>
+				<observers>
+					<mailup_sales_order_save_after>
+						<type>singleton</type>
+						<class>MailUp_MailUpSync_Model_Observer</class>
+						<method>prepareOrderForDataSync</method>
+					</mailup_sales_order_save_after>
+				</observers>
+			</sales_order_save_after>
+		</events>
+    </global>
+<!-- admin -->
+    <admin>
+        <routers>
+            <mailup>
+                <use>admin</use>
+                <args>
+                    <module>MailUp_MailUpSync</module>
+                    <frontName>mailup</frontName>
+                </args>
+            </mailup>
+        </routers>
+    </admin>
+<!-- default -->
+    <default>
+        <mailup_newsletter>
+            <mailup>
+                <model>mailup/ws</model>
+                <disablenewslettersuccesses>1</disablenewslettersuccesses>
+                <require_subscription_confirmation>1</require_subscription_confirmation>
+                <enable_testmode>0</enable_testmode>
+                <mailup_cron_frequency>0</mailup_cron_frequency>
+                <mailup_cron_offset>0</mailup_cron_offset>
+            </mailup>
+            <mailup_mapping>
+                <!-- Default mapping from Magento fields (or this extensions mapper) to MailUp fields -->
+                <Name>1</Name>
+                <Last>2</Last>
+                <Email>111</Email>
+                <Company>3</Company>
+                <Address>9</Address>
+                <City>4</City>
+                <ZIP>6</ZIP>
+                <Province>5</Province>
+                <Region>8</Region>
+                <LatestAbandonedCartTotal>21</LatestAbandonedCartTotal>
+                <LatestAbandonedCartDate>20</LatestAbandonedCartDate>
+                <LatestShippedOrderDate>18</LatestShippedOrderDate>
+                <LatestShippedOrderID>19</LatestShippedOrderID>
+                <AllOrderedProductIDs>26</AllOrderedProductIDs>
+                <LatestOrderCategoryIDs>17</LatestOrderCategoryIDs>
+                <TotalOrderedLast30d>25</TotalOrderedLast30d>
+                <TotalOrderedLast12m>24</TotalOrderedLast12m>
+                <TotalOrdered>23</TotalOrdered>
+                <LatestAbandonedCartID>22</LatestAbandonedCartID>
+                <Gender>10</Gender>
+                <CustomerID>12</CustomerID>
+                <Phone>11</Phone>
+                <LatestOrderAmount>15</LatestOrderAmount>
+                <LatestOrderDate>14</LatestOrderDate>
+                <LatestOrderID>13</LatestOrderID>
+                <LatestOrderProductIDs>16</LatestOrderProductIDs>
+            </mailup_mapping>
+        </mailup_newsletter>
+    </default>
+<!-- adminhtml -->
+    <adminhtml>
+        <menu>
+            <newsletter>
+                <children>
+                    <mailup translate="title">
+                        <title>MailUp</title>
+                        <children>
+	                        <mailup_configuration translate="title">
+		                        <title><![CDATA[Settings & Field Mapping]]></title>
+		                        <action>mailup/adminhtml_configuration</action>
+		                        <sort_order>0</sort_order>
+			                </mailup_configuration>
+                            <mailup_filters translate="title">
+                                <title>Filters</title>
+                                <action>mailup/adminhtml_filter</action>
+                                <sort_order>10</sort_order>
+                            </mailup_filters>
+                            <mailup_jobs module="mailup">
+                                <title>View MailUp Tasks</title>
+                                <sort_order>20</sort_order>
+                                <action>mailup/adminhtml_mailupbackend</action>
+                            </mailup_jobs>
+                            <mailup_sync module="mailup">
+                                <title>View Task Data</title>
+                                <sort_order>30</sort_order>
+                                <action>mailup/adminhtml_sync</action>
+                            </mailup_sync>
+                            <mailup_log module="mailup">
+                                <title>View Logs</title>
+                                <sort_order>40</sort_order>
+                                <action>mailup/adminhtml_log</action>
+                            </mailup_log>
+                        </children>
+                    </mailup>
+                </children>
+            </newsletter>
+        </menu>
+        <acl>
+            <resources>
+				<all>
+					<title>Allow everything</title>
+				</all>
+                <admin>
+                    <children>
+                        <newsletter>
+                            <children>
+								<mailup>
+									<title>Mailup</title>
+									<children>
+										<mailup_configuration>
+											<title>Mailup Configuration</title>
+										</mailup_configuration>
+										<mailup_filters>
+											<title>Mailup Filters</title>
+										</mailup_filters>
+										<mailup_fieldsmapping>
+											<title>Mailup Fields Mapping</title>
+										</mailup_fieldsmapping>
+										<mailup_viewdatatransferlog>
+											<title>View data transfer log</title>
+										</mailup_viewdatatransferlog>
+                                        <mailup_jobs translate="title">
+                                            <title>Mailup Jobs</title>
+                                        </mailup_jobs>
+                                        <mailup_sync translate="title">
+                                            <title>Mailup Job Data</title>
+                                        </mailup_sync>
+                                        <mailup_log translate="title">
+                                            <title>Mailup Logs</title>
+                                        </mailup_log>
+									</children>
+								</mailup>
+                            </children>
+                        </newsletter>
+
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <mailup_newsletter>
+                                            <title>Mailup Newsletter</title>
+                                        </mailup_newsletter>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                        
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <mailup>
+                    <file>mailup.xml</file>
+                </mailup>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <mailup>
+                    <files>
+                        <default>MailUp_MailUpSync.csv</default>
+                    </files>
+                </mailup>
+            </modules>
+        </translate>
+    </adminhtml>
+<!-- cron -->
+    <crontab>
+        <jobs>
+            <mailup_mailupsync>
+                <run><model>mailup/Cron::run</model></run>
+                <schedule>
+                    <!-- If config setting save, overrides default below -->
+                    <config_path>crontab/jobs/mailup_mailupsync/schedule/cron_expr</config_path>
+                    <!-- Default to run every 30 minutes -->
+                    <cron_expr>0,30 * * * *</cron_expr>
+                </schedule>
+            </mailup_mailupsync>
+        </jobs>
+    </crontab>
+</config>

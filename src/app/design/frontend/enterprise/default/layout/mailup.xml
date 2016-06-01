@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<layout>
+	<checkout_onepage_review>
+		<reference name="checkout.onepage.review.info.items.after">
+			<block type="mailup/checkout_subscribe" name="mailup.subscribe" template="mailup/subscribe.phtml" />
+		</reference>
+	</checkout_onepage_review>
+
+    <customer_account_index>
+        <reference name="customer_account_dashboard_info">
+            <action method="setTemplate">
+                <template>mailup/customer/account/dashboard/info.phtml</template>
+            </action>
+        </reference>
+    </customer_account_index>
+</layout>

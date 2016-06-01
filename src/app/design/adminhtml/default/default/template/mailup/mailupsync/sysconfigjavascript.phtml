@@ -1,0 +1,17 @@
+<?php
+/**
+ * This file is solely to instantiate the javascript in system config with values that can only be generated via php
+ */
+?>
+<script language="JavaScript">
+    // Initialise observer so that when list is changed, groups are reloaded
+    urlList = '<?php echo Mage::getModel('adminhtml/url')->getUrl("mailup/adminhtml_configuration/getgroups"); ?>';
+    document.observe("dom:loaded", function() {
+        initListObserver(urlList);
+    });
+    // Initialise observer to run self-test
+    urlTest = '<?php echo Mage::getModel('adminhtml/url')->getUrl("mailup/adminhtml_configuration/testconnection"); ?>';
+    document.observe("dom:loaded", function() {
+        initSelfTestObserver(urlTest);
+    });
+</script>

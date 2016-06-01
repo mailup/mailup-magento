@@ -1,0 +1,16 @@
+src/app/code/local/MailUp/MailUpSync    app/code/local/MailUp/MailUpSync
+src/app/design/adminhtml/default/default/layout/mailup.xml  app/design/adminhtml/default/default/layout/mailup.xml
+src/app/design/adminhtml/default/default/template/mailup/mailupsync app/design/adminhtml/default/default/template/mailup/mailupsync
+src/app/design/frontend/base/default/layout/mailup.xml  app/design/frontend/base/default/layout/mailup.xml
+src/app/design/frontend/base/default/template/mailup/customer/account/dashboard/info.phtml  app/design/frontend/base/default/template/mailup/customer/account/dashboard/info.phtml
+src/app/design/frontend/base/default/template/mailup/index.phtml    app/design/frontend/base/default/template/mailup/index.phtml
+src/app/design/frontend/base/default/template/mailup/subscribe.phtml    app/design/frontend/base/default/template/mailup/subscribe.phtml
+src/app/design/frontend/enterprise/default/layout/mailup.xml    app/design/frontend/enterprise/default/layout/mailup.xml
+src/app/design/frontend/enterprise/default/template/mailup/customer/account/dashboard/info.phtml    app/design/frontend/enterprise/default/template/mailup/customer/account/dashboard/info.phtml
+src/app/design/frontend/enterprise/default/template/mailup/subscribe.phtml  app/design/frontend/enterprise/default/template/mailup/subscribe.phtml
+src/app/etc/modules/MailUp_MailUpSync.xml   app/etc/modules/MailUp_MailUpSync.xml
+src/app/locale/en_US/MailUp_MailUpSync.csv  app/locale/en_US/MailUp_MailUpSync.csv
+src/app/locale/it_IT/MailUp_MailUpSync.csv  app/locale/it_IT/MailUp_MailUpSync.csv
+src/js/mailup/admin.js  js/mailup/admin.js
+src/skin/adminhtml/default/default/images/MailUp_300_200_transparent_small.png  skin/adminhtml/default/default/images/MailUp_300_200_transparent_small.png
+src/skin/adminhtml/default/default/mailup/mailupsync    skin/adminhtml/default/default/mailup/mailupsync

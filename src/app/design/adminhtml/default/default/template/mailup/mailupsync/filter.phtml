@@ -1,0 +1,535 @@
+<?php
+/**
+ * filter.phtml
+ */
+$storeId = $this->getRequest()->getParam('store_id');
+if(empty($storeId)) {
+    $storeId = NULL; //Mage::app()->getDefaultStoreView()->getStoreId();
+}
+
+$wsSend = new MailUpWsSend($storeId); /** @todo add in storeID, use session.. not needed really here... **/
+$accessKey = $wsSend->loginFromId();
+
+if ($accessKey === false || strlen(Mage::getStoreConfig('mailup_newsletter/mailup/list')) < 1) {
+    echo $this->__('WARNING: before proceeding you must correctly configure the settings of MailUp access in System->Configuration->Newsletter->MailUp');
+} else {
+    //controllo se la lista e' stata selezionata correttamente
+    $wsImport = new MailUpWsImport($storeId);
+    $mailupLists = $wsImport->GetNlList();
+
+    //carico i filtri salvati
+    $filterHints = $wsImport->getFilterHints();
+
+    //TODO: sembra inutilizzata
+    //chiamata attivazione web services su MailUp
+    //$urlWSActivation = 'http://'.Mage::getStoreConfig('newsletter/mailup/url_console').'/frontend/WSActivation.aspx?usr='.Mage::getStoreConfig('newsletter/mailup/user').'&pwd='.Mage::getStoreConfig('newsletter/mailup/password').'&nl_url='.Mage::getStoreConfig('newsletter/mailup/url_console').'&ws_name=WSMailUpImport';
+    //fopen($urlWSActivation, 'r');
+    
+    //salvo i parametri in variabili
+    $mailupCustomers = $this->getRequest()->getParam('mailupCustomers');
+    $mailupProductSku = $this->getRequest()->getParam('mailupProductSku');
+    $mailupCategoryId = $this->getRequest()->getParam('mailupCategoryId');
+    $mailupCustomerGroupId = $this->getRequest()->getParam('mailupCustomerGroupId');
+    $mailupCountry = $this->getRequest()->getParam('mailupCountry');
+    $mailupPostCode = $this->getRequest()->getParam('mailupPostCode');
+    $mailupCustomerStartDate = $this->getRequest()->getParam('mailupCustomerStartDate');
+    $mailupCustomerEndDate = $this->getRequest()->getParam('mailupCustomerEndDate');
+    $mailupTotalAmountCond = $this->getRequest()->getParam('mailupTotalAmountCond');
+    $mailupTotalAmountValue = $this->getRequest()->getParam('mailupTotalAmountValue');
+    $mailupOrderStartDate = $this->getRequest()->getParam('mailupOrderStartDate');
+    $mailupOrderEndDate = $this->getRequest()->getParam('mailupOrderEndDate');
+    $mailupOrderYesNo = $this->getRequest()->getParam('mailupOrderYesNo');
+    $mailupSubscribed = $this->getRequest()->getParam('mailupSubscribed');
+
+
+	function print_category($category)
+	{
+		if (is_numeric($category)) {
+			$category = Mage::getModel("catalog/category")->load($category);
+		}
+
+		echo '<option value="'.$category->getData('entity_id').'">'.str_repeat("-", $category->getData("level")-2) . htmlspecialchars($category->getData('name')).'</option>';
+		$children = $category->getChildren();
+		if (!$children) return;
+
+		$children = explode(",", $children);
+		foreach($children as $child) {
+			print_category($child);
+		}
+	}
+?>
+    
+<div class="content-header">
+	<table cellspacing="0" class="grid-header">
+	    <tr>
+		    <td>
+                <h3><?php echo $this->__('Filters')?></h3>
+            </td>
+            <td class="a-right">
+	            <div id="mailuploading" class="mailuploading"><?php echo $this->__("Please wait for the next step to load") ?></div>
+                <button onclick="$$('.content-header-floating').invoke('setStyle', {visibility:'hidden'});document.getElementById('mailupsend').style.display='none';document.getElementById('mailuploading').style.display='block';editForm.submit();" class="scalable save" type="button" id="mailupsend">
+                    <div class="mailuploading"></div><span><?php echo $this->__('Apply filter')?></span>
+                </button>
+            </td>
+	    </tr>
+	</table>
+</div>
+
+<div class="entry-edit">
+	<form id="edit_form" name="edit_form" method="post" action="<?php echo $this->getUrl('*/*/confirm')?>">
+	    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+
+        <input name="filter_name" id="filter_name" type="hidden" value="" />
+
+	    <p id="spansugger"><a href="#ottsugg"><?php echo $this->__('Get hints')?> &rArr;</a></p>
+	    <fieldset id="my-fieldset">
+		<table cellspacing="0" class="form-list">
+		    <tr>
+			    <td colspan="3"><?php echo $this->__('By this plugin you can import contacts registered in your eCommerce in the MailUp platform.')?></td>
+		    </tr>
+            </tr>
+            <tr>
+			    <td colspan="3">&nbsp;</td>
+		    </tr>
+            <tr>
+			    <td>
+                    <strong><?php echo $this->__('Store')?></strong>
+                </td>
+                <td colspan="2">
+                    <select name="store_id">
+                        <?php foreach($this->_getStoresArray() as $store): ?>
+                        <option value="<?php echo $store['id'] ?>">
+                            <?php echo $store['name'] ?>
+                        </option>
+                        <?php endforeach ?>
+                    </select>
+                </td>
+		    </tr>
+            <tr>
+			    <td colspan="3">&nbsp;</td>
+		    </tr>
+		    <tr>
+			    <td colspan="3">
+                    <strong><?php echo $this->__('Sold products')?></strong>
+                </td>
+		    </tr>
+		    <?php // Customer filter : 0 = all , 1 = who bought , 2 = who have never purchased ?>
+		    <tr>			
+                <td class="input-ele spdnpg1">
+                    <input type="radio" name="mailupCustomers" id="mailupCustomersAll" value="0" <?php if (!isset($mailupCustomers) || (isset($mailupCustomers) && $mailupCustomers == 0)) { echo 'checked="checked"'; } ?>
+                           onclick="customerDependentFilters(false);" />&nbsp;<label for="mailupCustomersAll"><?php echo $this->__('All customers')?></label>
+                </td>
+
+                <td class="input-ele spdnpg1">
+                    <input type="radio" name="mailupCustomers" id="mailupCustomersWhoHaveBought" value="1" <?php if (isset($mailupCustomers) && $mailupCustomers == 1) { echo 'checked="checked"'; } ?> 
+                           onclick="customerDependentFilters(false);" />&nbsp;<label for="mailupCustomersWhoHaveBought"><?php echo $this->__('Customers who have purchased')?></label>
+                </td>
+
+                <td class="input-ele spdnpg1">
+                    <input type="radio" name="mailupCustomers" id="mailupCustomersWhoHaventBought" value="2" <?php if (isset($mailupCustomers) && $mailupCustomers == 2) { echo 'checked="checked"'; } ?> 
+                           onclick="customerDependentFilters(true);" />&nbsp;<label for="mailupCustomersWhoHaventBought"><?php echo $this->__("Customers who have not purchased")?></label>
+                </td>
+		    </tr>
+            <tr>
+                <td colspan="3">
+                    <strong><?php echo $this->__('Opt-in Status')?></strong>
+                </td>
+            </tr>
+		    <tr>
+                <td>
+                    <input type="radio" name="mailupSubscribed" id="mailupSubscribedAllCustomers"
+                           value="0" <?php if (!isset($mailupSubscribed) || (isset($mailupSubscribed) && $mailupSubscribed == 0)) { echo 'checked="checked"'; } ?> />&nbsp;<label for="mailupSubscribedAllCustomers"><?php echo $this->__("All customers")?></label>
+                </td>
+                <td>
+                    <input type="radio" name="mailupSubscribed" id="mailupSubscribedOptIn" 
+                           value="1" <?php if (isset($mailupSubscribed) && $mailupSubscribed == 1) { echo 'checked="checked"'; } ?> />&nbsp;<label for="mailupSubscribedOptIn"><?php echo $this->__("Opted-in Only"); ?></label>
+                </td>
+                <td>
+                    <input type="radio" name="mailupSubscribed" id="mailupSubscribedNonOptIn"
+                           value="2" <?php if (isset($mailupSubscribed) && $mailupSubscribed == 2) { echo 'checked="checked"'; } ?> />&nbsp;<label for="mailupSubscribedNonOptIn"><?php echo $this->__("Non Opted-in Only"); ?></label>
+                </td>
+		    </tr>
+	    </table>
+	    
+		<br /><br />	
+
+	    <table cellspacing="0" class="form-list">			
+		    <tr>
+                <td colspan="2">
+                    <strong><?php echo $this->__('Groups')?></strong>
+                </td>
+		    </tr>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('Select customer group')?></td>
+                <td class="input-ele">
+                    <select name="mailupCustomerGroupId" class="slctpg1">
+                        <?php
+                        $customerGroups = Mage::helper('customer')->getGroups()->toOptionArray();
+
+                        if ($mailupCustomerGroupId) {
+                            foreach ($customerGroups as $customerGroup) {
+                                if ($mailupCustomerGroupId == $customerGroup['value']) {
+                                    echo '<option value="'.$customerGroup['value'].'">'.$customerGroup['label'].'</option>';
+                                }
+                            }
+                        }
+                        ?>
+
+                        <option value="0">-- <?php echo $this->__('Any')?> --</option>
+
+                        <?php
+                            foreach ($customerGroups as $customerGroup) {
+                                echo '<option value="'.$customerGroup['value'].'">'.$customerGroup['label'].'</option>';
+                            }
+                        ?>
+                    </select>
+                </td>
+		    </tr>
+		    
+		    <tr>
+			    <td colspan="2">
+                    <br /><br /><strong><?php echo $this->__('Location')?></strong>
+                </td>
+		    </tr>
+		    <tr>
+			    <td class="labelpg1"><?php echo $this->__('Select country')?></td>
+			    <td class="input-ele">
+                    <select name="mailupCountry" class="slctpg1">
+                    <?php
+                    $countries = Mage::getResourceModel('directory/country_collection')
+                        ->loadData()
+                        ->toOptionArray(false);
+
+                    if ($mailupCountry) {
+                        foreach ($countries as $country){
+                        if ($country['value'] == $mailupCountry)
+                            echo '<option value="'.$country['value'].'">'.$country['label'].'</option>';
+                        }
+                    }
+                    ?>
+				
+                    <option value="0">-- <?php echo $this->__('Any')?> --</option>
+				
+                    <?php
+                        foreach ($countries as $country) {
+                            echo '<option value="'.$country['value'].'">'.$country['label'].'</option>';
+                        }
+                    ?>
+			        </select>
+			    </td>
+		    </tr>
+		    <tr>
+			    <td class="labelpg1"><?php echo $this->__('Zip code')?></td>
+			    <td class="input-ele">
+			        <input type="text" class="inptptx1" name="mailupPostCode" size="10" value="<?php echo $mailupPostCode; ?>" /> <span class="tip">(<?php echo $this->__('e.g.')?> 12345)</span>
+			    </td>
+		    </tr>
+	    </table>
+
+	    <table cellspacing="0" class="form-list" id="customerDependentContainer">
+		    <tr>
+                <td colspan="2">
+                    <br /><br /><strong><?php echo $this->__('Products and categories')?></strong>
+                </td>
+            </tr>
+ 
+		    <?php //select con tutti i prodotti ?>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('Insert product SKU')?></td>
+                <td class="input-ele">
+                    <input type="text" class="inptptx1 customerDependent" name="mailupProductSku" size="20" value="<?php echo $mailupProductSku; ?>" /> <span class="tip">(<?php echo $this->__('e.g.')?> MYSKU123)</span>
+                </td>
+		    </tr>
+		    <?php //select con tutte le categorie ?>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('Select category')?></td>
+                <td class="input-ele">
+                    <?php
+                    $categoriesCollection = Mage::getModel('catalog/category')->getCollection();
+                    $categoriesCollection->addAttributeToSelect('name');
+                    $categoriesCollection->addAttributeToSelect('entity_id');
+                    ?>
+                    <select id="mailupCategoryId" name="mailupCategoryId" class="slctpg1 customerDependent">
+                        <?php
+                        if ($mailupCategoryId) {
+                            $category = Mage::getModel('catalog/category')->load($mailupCategoryId);
+                            echo '<option value="'.$mailupCategoryId.'">'.$category->getData('name').'</option>';
+                        }
+                        ?>
+
+                        <option value="0">-- <?php echo $this->__('Any')?> --</option>
+
+                        <?php
+                        foreach ($categoriesCollection as $category) {
+                            if ($category->getLevel() == 2) {
+	                            print_category($category);
+                            }
+                        }
+                        ?>
+                    </select>
+                </td>
+		    </tr>
+		    
+		    <tr>
+			    <td colspan="2">
+			        <br /><br /><strong><?php echo $this->__('Subscription date')?></strong>
+                </td>
+		    </tr>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('From')?></td>
+                <td class="input-ele">
+                    <input type="text" class="inptptx1 customerDependent" name="mailupCustomerStartDate" id="mailupCustomerStartDate" size="20" value="<?php echo $mailupCustomerStartDate; ?>" />
+                    <img id="mailupCustomerStartDateTrig" class="v-middle" alt="" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) ?>/adminhtml/default/default/images/grid-cal.gif"> <span class="tip">(<?php echo Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>)</span>
+					<script type="text/javascript">
+	                Calendar.setup({
+		                inputField: "mailupCustomerStartDate",
+		                ifFormat: "<?php echo Mage::app()->getLocale()->getDateStrFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>",
+		                showsTime: false,
+		                button: "mailupCustomerStartDateTrig",
+		                align: "Bl",
+		                singleClick : true
+	                });
+                    </script>
+                </td>
+		    </tr>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('To')?></td>
+                <td class="input-ele">
+                    <input type="text" class="inptptx1 customerDependent" name="mailupCustomerEndDate" id="mailupCustomerEndDate" size="20" value="<?php echo $mailupCustomerEndDate; ?>" />
+                    <img id="mailupCustomerEndDateTrig" class="v-middle" alt="" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) ?>/adminhtml/default/default/images/grid-cal.gif"> <span class="tip">(<?php echo Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>)</span>
+	                <script type="text/javascript">
+		                Calendar.setup({
+			                inputField: "mailupCustomerEndDate",
+			                ifFormat: "<?php echo Mage::app()->getLocale()->getDateStrFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>",
+			                showsTime: false,
+			                button: "mailupCustomerEndDateTrig",
+			                align: "Bl",
+			                singleClick : true
+		                });
+	                </script>
+                </td>
+		    </tr>
+		    <tr>
+			    <td colspan="2">
+			        <br /><br /><strong><?php echo $this->__('Total purchased amount')?></strong>
+                </td>
+		    </tr>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('Order total')?></td>
+                <td class="input-ele">
+                    <select id="mailupTotalAmountCond" name="mailupTotalAmountCond" class="slctpg2 customerDependent">
+                        <?php
+                        if ($mailupTotalAmountCond && $mailupTotalAmountCond != 'gt') {
+                            if ($mailupTotalAmountCond == 'lt') {
+                                echo '<option value="lt"> '.$this->__('less than').' </option>';
+                            } elseif ($mailupTotalAmountCond == 'eq') {
+                                echo '<option value="eq"> '.$this->__('same as').' </option>';
+                            }
+                        }
+                        ?>
+                        <option value="gt"> <?php echo $this->__('more than')?> </option>
+                        <option value="lt"> <?php echo $this->__('less than')?> </option>
+                        <option value="eq"> <?php echo $this->__('same as')?> </option>
+                    </select>
+
+		            <!--label for="mailupTotalAmountValue" class="lbl1"><?php echo $this->__('Specify amount')?></label-->&nbsp;
+			        <input type="text" class="inptptx1 customerDependent" id="mailupTotalAmountValue" name="mailupTotalAmountValue" size="20" value="<?php echo $mailupTotalAmountValue; ?>" /> <span class="tip">(<?php echo $this->__('e.g.')?> 50)</span>
+			    </td>
+		    </tr>
+		    
+		    <tr>
+			    <td colspan="2">
+                    <br /><br /><strong><?php echo $this->__('Date of purchase')?></strong>
+                </td>
+		    </tr>
+		    
+		    <tr>
+			    <td><?php echo $this->__('Show customers who'); ?></td>
+                <td>
+                    <select name="mailupOrderYesNo" class="slctpg2 customerDependent">
+                        <?php
+                        if ($mailupOrderYesNo == 'no') {
+                            echo '<option value="no">'.$this->__("Haven't purchased").'</option>';
+                        }
+                        ?>
+                        <option value="yes"> <?php echo $this->__('Have purchased'); ?> </option>
+                        <option value="no"> <?php echo $this->__("Haven't purchased"); ?> </option>
+                    </select>
+                </td>
+		    </tr>
+		    
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('From')?></td>
+                <td class="input-ele">
+	                <input type="text" class="inptptx1 customerDependent" name="mailupOrderStartDate" id="mailupOrderStartDate" size="20" value="<?php echo $mailupOrderStartDate; ?>" /><img id="mailupOrderStartDateTrig" class="v-middle" alt="" src="/skin/adminhtml/default/default/images/grid-cal.gif"> <span class="tip">(<?php echo Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>)</span>
+	                <script type="text/javascript">
+		                Calendar.setup({
+			                inputField: "mailupOrderStartDate",
+			                ifFormat: "<?php echo Mage::app()->getLocale()->getDateStrFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>",
+			                showsTime: false,
+			                button: "mailupOrderStartDateTrig",
+			                align: "Bl",
+			                singleClick : true
+		                });
+	                </script>
+                </td>
+		    </tr>
+		    <tr>
+                <td class="labelpg1"><?php echo $this->__('To')?></td>
+                <td class="input-ele">
+                    <input type="text" class="inptptx1 customerDependent" name="mailupOrderEndDate" id="mailupOrderEndDate" size="20" value="<?php echo $mailupOrderEndDate; ?>" /><img id="mailupOrderEndDateTrig" class="v-middle" alt="" src="/skin/adminhtml/default/default/images/grid-cal.gif"> <span class="tip">(<?php echo Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>)</span>
+	                <script type="text/javascript">
+		                Calendar.setup({
+			                inputField: "mailupOrderEndDate",
+			                ifFormat: "<?php echo Mage::app()->getLocale()->getDateStrFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>",
+			                showsTime: false,
+			                button: "mailupOrderEndDateTrig",
+			                align: "Bl",
+			                singleClick : true
+		                });
+	                </script>
+                </td>
+		    </tr>
+        </table>
+        </fieldset>
+	</form>
+
+    <h4><span id="spantitle3"><a name="saveFilter"><?php echo $this->__('Save current filters as hint')?></a></span></h4>
+    <fieldset id="my-fieldset3">
+        <table>
+            <tr>
+                <td>
+                    <input name="filter_name_text" id="filter_name_text" type="text" value="" maxlength="100" size="50" />
+                    <input class="form-button" type="submit" onclick="saveFilterHint();return false;" value="<?php echo $this->__('Save hint')?>" />
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+
+	<h4><span id="spantitle1"><a name="ottsugg"><?php echo $this->__('Filter hints')?></a></span></h4>
+	<fieldset id="my-fieldset2">
+	<table cellspacing="0" class="form-list">
+	    <tr>
+		    <td><?php echo $this->__('Set and customize one of the following filters:')?></td>
+	    </tr>
+        <tr>
+            <td>
+                <form action="*/*/" id="filtro1" name="filtro1" method="post">
+                    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+                    <input name="mailupCustomers" type="hidden" value="2" />
+                    <input name="mailupCustomerGroupId" type="hidden" value="2" />
+                    <p class="parscefil"><?php echo $this->__("All wholesale customers who haven't purchased yet")?> &raquo;</p>
+                    <input class="form-button" type="submit" value="<?php echo $this->__('Set hint')?>" />
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form action="*/*/" id="filtro2" name="filtro2" method="post">
+                    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+                    <input name="mailupCustomers" type="hidden" value="1" />
+                    <input name="mailupTotalAmountCond" type="hidden" value="gt" />
+                    <input name="mailupTotalAmountValue" type="hidden" value="50" />
+                    <p class="parscefil"><?php echo $this->__('More than 50 Euros orders')?> &raquo;</p>
+                    <input class="form-button" type="submit" value="<?php echo $this->__('Set hint')?>" />
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form action="*/*/" id="filtro3" name="filtro3" method="post">
+                    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+                    <input name="mailupCustomers" type="hidden" value="0" />
+                    <input name="mailupOrderYesNo" type="hidden" value="no" />
+                    <input name="mailupOrderStartDate" type="hidden" value="01/01/<?php echo date('Y'); ?>" />
+                    <p class="parscefil"><?php echo $this->__('Members with no purchase in')?> <?php echo date('Y'); ?> &raquo;</p>
+                    <input class="form-button" type="submit" value="<?php echo $this->__('Set hint')?>" />
+                </form>
+
+            </td>
+        </tr>
+
+        <?php if(!empty($filterHints)): ?>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><?php echo $this->__('Or choose one of those you saved:')?></td>
+            </tr>
+        <?php endif ?>
+
+        <?php
+        foreach ($filterHints as $fh) {
+            $filter_name = $fh['filter_name'];
+            echo '<tr><td>';
+            echo '<form action="*/*/" id="'.$filter_name.'" name="'.$filter_name.'" method="post">';
+            echo '<input name="form_key" type="hidden" value="'. Mage::getSingleton('core/session')->getFormKey() .'" />';
+            $hints = explode('|', $fh['hints']);
+            foreach ($hints as $h) {
+                $array = explode('=', $h);
+                echo '<input name="'.$array[0].'" type="hidden" value="'.$array[1].'" />';
+            }
+            echo '<p class="parscefil">'.$filter_name.' &raquo;</p>';
+            echo '<input class="form-button" type="submit" value="'.$this->__('Set hint').'" />';
+            echo '</form>';
+            echo '&nbsp;';
+            echo '<form name="deleteForm_'.$filter_name.'" action="'.$this->getUrl('*/*/deleteFilterHint').'" method="post">';
+            echo '<input name="form_key" type="hidden" value="'. Mage::getSingleton('core/session')->getFormKey() .'" />';
+            echo '<input name="filter_name" type="hidden" value="'. $filter_name .'" />';
+            echo '<input class="form-button" type="submit" name="delete" onclick="if(confirm(\''.$this->__('Do you really want to delete this filter hint?').'\')==true){this.submit();}return false;" value="'.$this->__('Delete hint').'" />';
+            echo '</form>';
+            echo '</td></tr>';
+        } ?>
+
+    </table>
+    </fieldset>
+
+    <!--<a href="<?php echo $this->getUrl('*/*/testCron')?>">TEST CRON</a>
+    <a href="<?php echo $this->getUrl('*/*/testFields')?>">TEST GETFIELDS</a>-->
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+
+    document.getElementsByClassName = function(className) {
+        var retnode = [];
+        var myclass = new RegExp('\\b'+className+'\\b');
+        var elements = this.getElementsByTagName('*');
+        var elementsLength = elements.length;
+        var element = null;
+        for (var i = 0; i < elementsLength; i++) {
+            element = elements[i];
+            if (myclass.test(element.className)) {
+                retnode.push(element);
+            }
+        }
+        return retnode;
+    };
+
+    function customerDependentFilters(isDisabled) {
+        document.getElementById('customerDependentContainer').style.display = (isDisabled) ? 'none' : 'block';
+
+        var elements = document.getElementsByClassName('customerDependent');
+
+        var elementsLength = elements.length;
+        for (var i=0; i < elementsLength; i++) {
+            elements[i].disabled = isDisabled;
+        }
+    }
+
+    function saveFilterHint() {
+        if (document.getElementById('filter_name_text').value=='') {
+            alert('<?php echo $this->__('Please, give your new hint a name.')?>');
+        } else {
+            document.getElementById('filter_name').value = document.getElementById('filter_name_text').value;
+            document.getElementById('edit_form').action = '<?php echo $this->getUrl('*/*/saveFilterHint')?>';
+            document.getElementById('edit_form').submit();
+        }
+        return false;
+    }
+
+    window.onload = function() {
+        var isDisabled = document.getElementById('mailupCustomersWhoHaventBought').checked;
+        customerDependentFilters(isDisabled);
+    }
+</script>
+<?php } ?>

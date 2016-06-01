@@ -1,0 +1,486 @@
+<?xml version="1.0"?>
+
+<config>    
+<!-- Top Level Tabs -->
+    <tabs>
+        <mailup_tab translate="label" module="mailup">
+            <label>MailUP</label>
+            <class>mailup-tab-parent</class>
+            <sort_order>300</sort_order>
+        </mailup_tab>
+    </tabs>
+    
+    <sections>
+        <mailup_newsletter>
+            <class>mailup-tab</class>
+            <!--<header_css>internetware-tab</header_css>-->
+            <label><![CDATA[Settings & Field Mapping]]></label>
+            <tab>mailup_tab</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>99999</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+
+            <groups>
+                <!-- main config section -->
+                <mailup translate="label">
+                    <label>MailUp Extension Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <url_console translate="label comment">
+                            <label>Admin Console URL</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>It's the domain portion of the URL to your MailUp Admin console (e.g. g4a0.s03.it)</comment>
+	                        <backend_model>mailup/consoleurlvalidator</backend_model>
+                        </url_console>
+                        <username_ws translate="label comment">
+                            <label>Web Service Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+	                        <backend_model>mailup/webserviceusernamevalidator</backend_model>
+                        </username_ws>
+                        <password_ws translate="label comment">
+                            <label>Web Service Password</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>For assistance visit http://help.mailup.com/x/PgAy</comment>
+                        </password_ws>
+                        <check translate="label">
+                            <label>Test Connection</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>mailup/adminhtml_system_config_form_testbutton</frontend_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </check>
+                        <list translate="label">
+                            <label>List</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailup/source_lists</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </list>
+                        <default_group translate="label comment">
+                            <label>Default Group</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailup/source_groups</source_model>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Used as default group in all subscriptions that do not have a manual group set</comment>
+                        </default_group>
+	                    <enable_subscribe_in_checkout tranlate="label comment">
+		                    <label>Enable subscription checkbox during checkout</label>
+		                    <frontend_type>select</frontend_type>
+		                    <source_model>adminhtml/system_config_source_yesno</source_model>
+		                    <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+			            </enable_subscribe_in_checkout>
+                        <require_subscription_confirmation tranlate="label comment">
+                            <label>Require Subscription Confirmation</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>75</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Defines whether double opt-in is required</comment>
+                        </require_subscription_confirmation>
+                        <disablenewslettersuccesses translate="label">
+                            <label>Disable Magento Newsletter Subscription Notification</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>78</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Disables the default notification sent by Magento if set to "Yes"</comment>
+                        </disablenewslettersuccesses>
+                        <enable_cron_export tranlate="label comment">
+                            <label>Enable Automatic Data Export to MailUp</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable_cron_export>
+                        <qualifying_order_statuses>
+                            <label>Order Statuses to Match For Customer Totals</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status</source_model>
+                            <sort_order>83</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>If none set, those that are complete, closed or processing will be matched</comment>
+                        </qualifying_order_statuses>
+                        <server_timezone translate="label comment">
+                            <label>Server Timezone</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>mailup/adminhtml_system_config_form_field_timezone</frontend_model>
+                            <sort_order>85</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_class>disabled</frontend_class>
+                        </server_timezone>
+                        <mailup_cron_frequency translate="label comment">
+                            <label>Export Frequency</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailup/adminhtml_system_source_cron_frequency</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </mailup_cron_frequency>
+                        <mailup_cron_offset translate="label comment">
+                            <label>Export Offset (in hours)</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-digits</validate>
+                            <sort_order>95</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>e.g. Offset of 2 hours and frequency of each 12 hours will run at 02:00 and 14:00</comment>
+                        </mailup_cron_offset>
+                        <webhook_crypt_key>
+                            <label>Webhook Crypt Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </webhook_crypt_key>
+                        <enable_log>
+                            <label>Enable Module Debugging Log</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable_log>
+                    </fields>
+                </mailup>
+                <!-- mapping section -->
+                <mailup_mapping translate="label">
+                    <label>MailUp Field Mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>5</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <comment>Matching Magento customer attributes (on the left) with MailUp attributes (on the right)</comment>
+                    <fields>
+                        <Name translate="comment">
+                            <label>Name</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Name>
+                        <Last translate="comment">
+                            <label>Last</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <!--<comment>test..</comment>-->
+	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Last>
+                        <Email translate="comment">
+                            <label>Email</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Email>
+                        <Company translate="comment">
+                            <label>Company</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Company>
+                        <Address translate="comment">
+                            <label>Address</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Address>
+                        <City translate="comment">
+                            <label>City</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>6</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </City>
+                        <ZIP translate="comment">
+                            <label>ZIP</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>7</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </ZIP>
+                        <Province translate="comment">
+                            <label>Province</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>8</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Province>
+                        <Region translate="comment">
+                            <label>Region</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Region>
+                        <Country translate="comment">
+                            <label>Country</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Country>
+                        <Gender translate="comment">
+                            <label>Gender</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Gender>
+                        <DateOfBirth translate="comment">
+                            <label>DateOfBirth</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </DateOfBirth>
+                        <CustomerID translate="comment">
+                            <label>CustomerID</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </CustomerID>
+                        <Phone translate="comment">
+                            <label>Phone</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Phone>
+                        <Fax translate="comment">
+                            <label>Fax</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </Fax>
+                        <LatestOrderID translate="comment">
+                            <label>LatestOrderID</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestOrderID>
+                        <LatestOrderDate translate="comment">
+                            <label>LatestOrderDate</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestOrderDate>
+                        <LatestOrderAmount translate="comment">
+                            <label>LatestOrderAmount</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestOrderAmount>
+                        <LatestOrderProductIDs translate="comment">
+                            <label>LatestOrderProductIDs</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestOrderProductIDs>
+                        <LatestOrderCategoryIDs translate="comment">
+                            <label>LatestOrderCategoryIDs</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestOrderCategoryIDs>
+                        <LatestShippedOrderDate translate="comment">
+                            <label>LatestShippedOrderDate</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestShippedOrderDate>
+                        <LatestShippedOrderID translate="comment">
+                            <label>LatestShippedOrderID</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestShippedOrderID>
+                        <LatestAbandonedCartDate translate="comment">
+                            <label>LatestAbandonedCartDate</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestAbandonedCartDate>
+                        <LatestAbandonedCartTotal translate="comment">
+                            <label>LatestAbandonedCartTotal</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestAbandonedCartTotal>
+                        <LatestAbandonedCartID translate="comment">
+                            <label>LatestAbandonedCartID</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </LatestAbandonedCartID>
+                        <TotalOrdered translate="comment">
+                            <label>TotalOrdered</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </TotalOrdered>
+                        <TotalOrderedLast12m translate="comment">
+                            <label>TotalOrderedLast12m</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </TotalOrderedLast12m>
+                        <TotalOrderedLast30d translate="comment">
+                            <label>TotalOrderedLast30d</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </TotalOrderedLast30d>
+                        <AllOrderedProductIDs translate="comment">
+                            <label>AllOrderedProductIDs</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                        </AllOrderedProductIDs>
+                    </fields>
+                </mailup_mapping>
+                <mailup_mapping_custom translate="label">
+                    <label>Custom Customer Attributes</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <clone_fields>1</clone_fields>
+                    <clone_model>mailup/adminhtml_system_clone_mappings_custom</clone_model>
+                    <comment>Matching custom Magento customer attributes (on the left) with MailUp attributes (on the right)</comment>
+                    <fields>
+                        <custom_customer_attributes translate="label">
+                            <label></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </custom_customer_attributes>
+                    </fields>
+                </mailup_mapping_custom>
+            </groups>
+        </mailup_newsletter>
+    </sections>
+</config>

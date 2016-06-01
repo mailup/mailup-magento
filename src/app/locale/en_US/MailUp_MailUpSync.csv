@@ -1,0 +1,91 @@
+Members have not been sent correctly,Customers have not been sent correctly
+Warning: no member has been selected,Warning: no customer has been selected
+WARNING: before proceeding you must correctly configure the settings of MailUp access in System->Configuration->Newsletter->MailUp,WARNING: before proceeding you must correctly configure the MailUp extension settings under System->Configuration->Newsletter->MailUp
+Apply filter,Apply filter
+Get hints,View saved filters
+Sold products,Purchase History
+All customers,All customers
+Customers who have purchased,Customers who have purchased
+Customers who have not purchased,Customers who have not purchased
+Select product,Select product
+Any,Any
+Select category,Products that belong to this category...
+Groups,Groups
+Select customer group,Select customer group
+Location,Location
+Select country,Select country
+Zip code,Zip code
+From,Between
+To,And
+Total purchased amount,Total purchased amount
+Order total,Customers who have ordered
+less than,less than
+same as,exactly
+more than,more than
+Specify amount,Specify amount
+Date of purchase,Purchase timeframe
+Show customers who,Show customers who
+Haven't purchased,did not purchase
+Have purchased,purchased
+In this period,In this period
+Filter hints,Saved filters
+All wholesale customers who haven't purchased yet,All wholesale customers who haven't purchased yet
+Set filter,Set filter
+More than 50 Euros orders,Customer who purchased over $50
+Members with no purchase in,Members with no purchase in
+Reset filters,Reset filters
+Export to CSV,Export to CSV
+Send to MailUp,Send to MailUp
+Confirm filtered customers and select MailUp group,Confirm filtered customers and select MailUp group
+Were found,Were found
+records,records
+Filtered customers,Filtered customers
+Selected list,Selected list
+Next step,Next step
+Select group,Select group
+Select an existing group,Select an existing group
+or,or
+Create new customer group,Create new customer group
+Group name,Group name
+Add a new e-mail address or select adresses to be removed from list,Add new email addresses or select addresses to be removed from list
+Change members list: please add one email adress per row,Edit customers list: add one email address per row
+Save changes,Save changes
+Set and customize one of the following filters:,Set and customize one of the following filters:
+Filter customers,Filter customers
+You can find it on your browser url bar (e.g. g4a0.s03.it),Shown in your browser address field when you use MailUp (e.g. g4a0.s03.it)
+"If you haven't yet, we suggest you to create a DEM list directly from your mailup console","If you haven't yet, we suggest you to create an 'ecommerce' (or similar) list in your MailUp account"
+Insert product SKU,Products whose SKU contains...
+Enable Cron Export,Enable Cron Export
+Subscription date,Subscription date
+Save hint,Save filter
+Delete hint,Delete
+Set hint,Use this filter
+Or choose one of those you saved:,Or choose one of those you saved:
+Do you really want to delete this hint?,Do you really want to delete this filter?
+"Please, give your new hint a name.",Please provide a name for the filter.
+Save current filters as hint,Save this filter
+Opted-in Only,Opted-in Only
+All customers,All customers
+Products and categories,Products and categories
+dd/mm/yyyy,dd/mm/yyyy
+e.g.,e.g.
+Opt-in Status,Opt-in Status
+"Magento fields","Magento fields"
+"Mailup fields","Mailup fields"
+"Fields mapping","Map Fields"
+Filters,"Sync/segment Customers"
+"By this plugin you can import contacts registered in your eCommerce in the MailUp platform.","Create custom segments using the filters below and easily transfer them to a new or existing Group in your MailUp account."
+"Web service username is not in the right format","Web service username is not in the right format, it should be the a letter followed by some numbers (eg: a12345)"
+"Please fill the admin console URL","Please fill the admin console URL"
+"Admin console URL is not in the right format","Admin console URL is not in the right format, a valid URL example is abc123.s00.it"
+"Unable to connect to MailUp console","Unable to connect to your MailUp account"
+"Your subscription is waiting for confirmation","Your subscription to the newsletter is waiting for confirmation, please check your email and click the confirmation link"
+"MailUp configuration is not complete", "MailUp configuration is not complete, please <a href=''>click here</a> to fill the missing information"
+"MailUp fields mapping is not complete","MailUp fields mapping is not complete, please <a href=''>click here</a> to fill the missing information"
+"Filtered customers preview","Filtered customers preview (max 25)"
+"Members have been sent correctly","Customers segmented successfully. The data export to MailUp will start within 5 minutes. The duration of the export process depends on the total amount of data being transferred."
+"A MailUp import process is schedules and will be executed soon.","A MailUp import process is scheduled and will be executed soon."
+"Check your email to confirm your subscription to our newsletter.","Check your email to confirm your subscription to our newsletter."
+"Default Group","Default Group"
+"Used as default group in all subscriptions that do not have a manual group set","Used as default group in all subscriptions that do not have a manual group set"
+"Config warning: mysql.connect_timeout is %d which is a bit low. This may cause intermittent issues when connecting with MailUp. Please contact your Web host to discuss an increase in the timeout setting.'","Config warning: mysql.connect_timeout is %d which is a bit low. This may cause intermittent issues when connecting with MailUp. Please contact your Web host to discuss an increase in the timeout setting.'"

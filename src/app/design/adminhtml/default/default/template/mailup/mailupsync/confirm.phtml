@@ -1,0 +1,237 @@
+<?php
+/**
+ * confirm.phtml
+ */
+$storeId = $this->getRequest()->getParam('store_id');
+if(empty($storeId)) {
+    $storeId = NULL; //Mage::app()->getDefaultStoreView()->getStoreId();
+}
+
+//ottengo l'elenco delle liste e dei gruppi da mailup
+$wsImport = new MailUpWsImport($storeId);
+
+$customersFiltered = $wsImport->getCustomersFiltered($this, $storeId);
+
+$xmlString = $wsImport->GetNlList();
+$xmlString = html_entity_decode($xmlString);
+
+$startLists = strpos($xmlString, '<Lists>');
+$endPos = strpos($xmlString, '</Lists>');
+$endLists = $endPos + strlen('</Lists>') - $startLists;
+
+$xmlLists = substr($xmlString, $startLists, $endLists);
+$xmlLists = str_replace("&", "&amp;", $xmlLists);
+$xml = simplexml_load_string($xmlLists);
+?>
+
+<?php //creo il form nascosto per passare i parametri al tasto back ?>
+<form id="back_form" name="back_form" method="post" action="<?php echo $this->getUrl('*/*/'); ?>">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+    <input type="hidden" name="store_id" value="<?php echo $this->getRequest()->getParam('store_id'); ?>" />
+    <input type="hidden" name="mailupCustomers" value="<?php echo $this->getRequest()->getParam('mailupCustomers'); ?>" />
+    <input type="hidden" name="mailupProductSku" value="<?php echo $this->getRequest()->getParam('mailupProductSku'); ?>" />
+    <input type="hidden" name="mailupCategoryId" value="<?php echo $this->getRequest()->getParam('mailupCategoryId'); ?>" />
+    <input type="hidden" name="mailupCustomerGroupId" value="<?php echo $this->getRequest()->getParam('mailupCustomerGroupId'); ?>" />
+    <input type="hidden" name="mailupCountry" value="<?php echo $this->getRequest()->getParam('mailupCountry'); ?>" />
+    <input type="hidden" name="mailupPostCode" value="<?php echo $this->getRequest()->getParam('mailupPostCode'); ?>" />
+    <input type="hidden" name="mailupCustomerStartDate" value="<?php echo $this->getRequest()->getParam('mailupCustomerStartDate'); ?>" />
+    <input type="hidden" name="mailupCustomerEndDate" value="<?php echo $this->getRequest()->getParam('mailupCustomerEndDate'); ?>" />
+    <input type="hidden" name="mailupTotalAmountCond" value="<?php echo $this->getRequest()->getParam('mailupTotalAmountCond'); ?>" />
+    <input type="hidden" name="mailupTotalAmountValue" value="<?php echo $this->getRequest()->getParam('mailupTotalAmountValue'); ?>" />
+    <input type="hidden" name="mailupOrderStartDate" value="<?php echo $this->getRequest()->getParam('mailupOrderStartDate'); ?>" />
+    <input type="hidden" name="mailupOrderEndDate" value="<?php echo $this->getRequest()->getParam('mailupOrderEndDate'); ?>" />
+    <input type="hidden" name="mailupOrderYesNo" value="<?php echo $this->getRequest()->getParam('mailupOrderYesNo'); ?>" />
+    <input type="hidden" name="mailupSubscribed" value="<?php echo $this->getRequest()->getParam('mailupSubscribed'); ?>" />
+</form>
+
+<form id="csv_form" name="csv_form" method="post" action="<?php echo $this->getUrl('*/*/csv'); ?>">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+    <input type="hidden" name="store_id" value="<?php echo $this->getRequest()->getParam('store_id'); ?>" />
+    <?php
+    $countPost = 0;
+    $textArea = '';
+    $formParams = '';
+    $mailupCustomerIds = array();
+    //mi passo gli id di tutti i clienti filtrati
+    foreach ($customersFiltered as $i=>$customer) {
+	    if ($i++ < 25) $textArea .= $customer['email'] . "\n";
+	    $mailupCustomerIds[$countPost] = $customer['entity_id'];
+	    $countPost++;
+    }
+    //salvo l'array nella sessione
+    if ($countPost > 0) {
+	    Mage::getSingleton('core/session')->setMailupCustomerIds($mailupCustomerIds);
+    }
+    ?>
+    <input name="countPost" type="hidden" value="<?php echo $countPost; ?>" />
+</form>
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('MailUp')?></h3></td>
+            <td class="a-right">
+	            <div id="mailuploading" class="mailuploading"><?php echo $this->__("Please wait for the next step to load") ?></div>
+	            <button id="mailupback" onclick="back_form.submit()" class="scalable back" type="button"><span><?php echo $this->__('Reset filters')?></span></button>
+                <button onclick="if (!editForm.validate()){return false;} $$('.content-header-floating').invoke('setStyle', {visibility:'hidden'});document.getElementById('mailupsend').style.display='none';document.getElementById('mailupback').style.display='none';document.getElementById('mailuploading').style.display='block';editForm.submit()"
+                        class="scalable save" type="button" id="mailupsend">
+                    <span><?php echo $this->__('Send to MailUp')?></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">	
+	<?php foreach($xml->List as $list) : ?>
+        <?php /* @var $list SimpleXMLElement */ ?>
+        <?php $listId = (string) $list['idList'] ?>
+        <?php if($listId == Mage::getStoreConfig('mailup_newsletter/mailup/list', $storeId)): ?>
+            <?php $listName = (string) $list['listName'] ?>
+            <?php $idList = (string) $list['idList'] ?>
+            <?php $listGUID = (string) $list['listGUID'] ?>
+        <?php endif ?>
+	<?php endforeach ?>
+    <?php if (!isset($idList)): ?>
+    <h4><?php echo $this->__('There is no list selected in MailUp config. Please select one.')?></h4>
+    <?php else: ?>
+    <form id="edit_form" name="edit_form" method="post" action="<?php echo $this->getUrl('*/*/post')?>">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <input type="hidden" name="store_id" value="<?php echo $this->getRequest()->getParam('store_id'); ?>" />
+	    <input name="mailupIdList" type="hidden" value="<?php echo $idList; ?>" />
+	    <input name="mailupListGUID" type="hidden" value="<?php echo $listGUID; ?>" />
+	
+	    <h4><span id="spantitle3"><?php echo $this->__('Confirm filtered customers and select MailUp group')?></span></h4>
+        <fieldset id="my-fieldset">
+	    <table cellspacing="0" class="form-list">
+            <tr>
+                <td colspan="2"><h4><?php echo $this->__('Were found')?> <strong><?php echo $countPost; ?></strong> <?php echo $this->__('records')?></h4></td>
+            </tr>
+            <tr>
+                <td><?php echo $this->__('Filtered customers preview')?>:</td>
+            </tr>
+            <tr>
+                <td>
+                <textarea name="mailupCustomerFilteredView" rows="5" cols="50" disabled="disabled" class="txtar1"><?php echo $textArea ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <?php echo $this->__('Selected list')?>: <strong>
+                    <?php echo $listName; ?><br /><br /><br />
+                </strong></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td>
+                    <h4><?php echo $this->__('Next step')?></h4>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">
+                    <p class="slgrp1"><?php echo $this->__('Select group')?> <input type="radio" name="mailupNewGroup" value="0" checked="checked" /></p>
+                </td>
+            </tr>
+            <tr>
+                <td class="input-ele">
+                    <p class="istrz1"><?php echo $this->__('Select an existing group')?>:</p>
+                    <select class="required-entry slctpg1" name="mailupGroupId">
+                    <?php
+                    $groups = array();
+                    foreach($xml->List as $list) {
+                        if ($list['idList'] == Mage::getStoreConfig('mailup_newsletter/mailup/list', $storeId)){
+                            foreach($list->Groups->Group as $group) {
+	                            $groups[(string)$group['idGroup']] = (string)$group['groupName'];
+                            }
+                        }
+                    }
+                    @asort($groups);
+                    $defaultGroupId = Mage::getStoreConfig('mailup_newsletter/mailup/default_group');
+                    foreach ($groups as $tmpid=>$tmpname) {
+	                    echo '<option value="'.$tmpid.'"';
+                        // If there is a default group set in config, pre-select this
+                        if ($tmpid == $defaultGroupId) {
+                            echo ' selected="selected"';
+                        }
+                        echo '>'.htmlspecialchars($tmpname).'</option>';
+                    }
+                    ?>
+                    </select>
+                    <br /><br />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="istrz2"><?php echo $this->__('or')?></p>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">
+                    <p class="slgrp1"><?php echo $this->__('Create new customer group')?> <input type="radio" name="mailupNewGroup" value="1" /></p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="istrz1"><?php echo $this->__('Group name')?>:</p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" name="mailupNewGroupName" size="60" class="inptptx2" />
+                </td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td>
+                    <h4><?php echo $this->__('Next step')?></h4>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox" name="send_optin_email_to_new_subscribers" id="send_optin" value="1"<?php if($listId == Mage::getStoreConfig('mailup_newsletter/mailup/require_subscription_confirmation', $storeId)): ?> checked="checked" <?php endif ?> /> <label for="send_optin" ><?php echo $this->__('Send opt-in email to new subscribers') ?></label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label id="message_id_label" class="istrz1" for="message_id"><?php echo $this->__('Message ID (optional)'); ?></label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" name="message_id" id="message_id" size="60" class="inptptx2 validate-digits" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p><a href="http://help.mailup.com/x/PYMd"><?php echo $this->__('See the documentation for details') ?></a></p>
+                </td>
+            </tr>
+        </table>
+        </fieldset>
+    </form>
+    <?php endif; ?>
+
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+
+    // Show/hide Message ID option box
+    var optin = $('send_optin');
+    displayIfSelected($('message_id'), optin);
+    displayIfSelected($('message_id_label'), optin);
+
+    optin.addEventListener('change', function(){
+        displayIfSelected($('message_id'), optin);
+        displayIfSelected($('message_id_label'), optin);
+    });
+
+    function displayIfSelected(toShow, ifSelected) {
+        if (ifSelected.checked) {
+            toShow.show();
+        } else {
+            toShow.hide();
+        }
+    }
+</script>

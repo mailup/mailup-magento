@@ -1,0 +1,72 @@
+<form name="viewdatatransferlog_form" action="<?php echo $this->getUrl('*/*/search') ?>"  method="post">
+	<input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+	<div class="content-header">
+		<table cellspacing="0" class="grid-header">
+			<tr>
+				<td style="width:50%">
+					<h3><?php echo $this->__("View data transfer log") ?></h3>
+				</td>
+				<td class="form-buttons">
+					<button onclick="searchForm.submit()"><?php echo $this->__("Search") ?></button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="grid">
+		<div class="hor-scroll">
+			<table class="data" cellspacing="0">
+				<thead>
+					<tr class="headings">
+						<th><span class="nobr"><?php echo $this->__("Date/time") ?></span></th>
+						<th><span class="nobr"><?php echo $this->__("Type") ?></span></th>
+						<th><span class="nobr"><?php echo $this->__("Result") ?></span></th>
+						<th class="last"><span class="nobr"><?php echo $this->__("N. updated records") ?></span></th>
+					</tr>
+					<tr class="filter">
+						<th><div class="range"><div class="range-line date">
+							<span class="label"><?php echo $this->__("From") ?>:</span>
+							<input type="text" class="input-text no-changes" value="" id="sales_order_grid_filter_created_at1354009617.6284_from" name="date_from">
+							<img title="" id="sales_order_grid_filter_created_at1354009617.6284_from_trig" class="v-middle" alt="" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) ?>/adminhtml/default/default/images/grid-cal.gif">
+						</div><div class="range-line date">
+							<span class="label"><?php echo $this->__("To") ?>:</span>
+							<input type="text" class="input-text no-changes" value="" id="sales_order_grid_filter_created_at1354009617.6284_to" name="date_to">
+							<img title="" id="sales_order_grid_filter_created_at1354009617.6284_to_trig" class="v-middle" alt="" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) ?>/adminhtml/default/default/images/grid-cal.gif">
+						</div></div><input type="hidden" value="it_IT" name="created_at[locale]"><script type="text/javascript">
+							Calendar.setup({
+								inputField : "sales_order_grid_filter_created_at1354009617.6284_from",
+								ifFormat : "<?php echo Mage::app()->getLocale()->getDateStrFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>",
+								button : "sales_order_grid_filter_created_at1354009617.6284_from_trig",
+								showsTime: false,
+								align : "Bl",
+								singleClick : true
+							});
+							Calendar.setup({
+								inputField : "sales_order_grid_filter_created_at1354009617.6284_to",
+								ifFormat : "<?php echo Mage::app()->getLocale()->getDateStrFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT) ?>",
+								button : "sales_order_grid_filter_created_at1354009617.6284_to_trig",
+								showsTime: false,
+								align : "Bl",
+								singleClick : true
+							});
+						</script></th>
+						<th><select name="type">
+							<option selected="selected" value=""></option>
+							<option value="automatic"><?php echo $this->__("Automatic") ?></option>
+							<option value="manual"><?php echo $this->__("Manual") ?></option>
+						</select></th>
+						<th><select name="result">
+							<option selected="selected" value=""></option>
+							<option value="completed"><?php echo $this->__("Completed") ?></option>
+							<option value="partial"><?php echo $this->__("Partial") ?></option>
+							<option value="failed"><?php echo $this->__("Failed") ?></option>
+						</select></th>
+						<th class="last">&nbsp;</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</form>
+<script type="text/javascript">
+	var searchForm = new varienForm('viewdatatransferlog_form');
+</script>

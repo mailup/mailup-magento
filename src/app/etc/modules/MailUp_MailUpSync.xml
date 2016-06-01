@@ -1,0 +1,1 @@
+<?xml version="1.0"?><config>    <modules>        <MailUp_MailUpSync>            <active>true</active>            <codePool>local</codePool>            <depends>                <Mage_Newsletter />            </depends>        </MailUp_MailUpSync>    </modules></config>
