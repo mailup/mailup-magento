@@ -62,4 +62,9 @@ class MailUp_MailUpSync_Adminhtml_MailupbackendController extends Mage_Adminhtml
 
         $this->_redirect('*/*/index');
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_jobs');
+    }
 }
