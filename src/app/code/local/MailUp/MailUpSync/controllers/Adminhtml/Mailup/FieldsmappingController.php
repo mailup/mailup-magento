@@ -4,7 +4,7 @@
  */
 require_once dirname(__FILE__) . "/../../Model/MailUpWsImport.php";
 require_once dirname(__FILE__) . "/../../Model/Wssend.php";
-class MailUp_MailUpSync_Adminhtml_FieldsMappingController extends Mage_Adminhtml_Controller_Action
+class MailUp_MailUpSync_Adminhtml_Mailup_FieldsMappingController extends Mage_Adminhtml_Controller_Action
 {
     public function indexAction() {
         $this->loadLayout()->renderLayout();

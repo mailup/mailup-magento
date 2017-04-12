@@ -182,13 +182,13 @@
 <!-- admin -->
     <admin>
         <routers>
-            <mailup>
-                <use>admin</use>
-                <args>
-                    <module>MailUp_MailUpSync</module>
-                    <frontName>mailup</frontName>
-                </args>
-            </mailup>
+            <adminhtml>
+				<args>
+					<modules>
+						<mailup before="Mage_Adminhtml">MailUp_MailUpSync_Adminhtml</mailup>
+					</modules>
+				</args>
+			</adminhtml>
         </routers>
     </admin>
 <!-- default -->
@@ -243,28 +243,28 @@
                         <children>
 	                        <mailup_configuration translate="title">
 		                        <title><![CDATA[Settings & Field Mapping]]></title>
-		                        <action>mailup/adminhtml_configuration</action>
+		                        <action>adminhtml/mailup_configuration</action>
 		                        <sort_order>0</sort_order>
 			                </mailup_configuration>
                             <mailup_filters translate="title">
                                 <title>Filters</title>
-                                <action>mailup/adminhtml_filter</action>
+                                <action>adminhtml/mailup_filter</action>
                                 <sort_order>10</sort_order>
                             </mailup_filters>
                             <mailup_jobs module="mailup">
                                 <title>View MailUp Tasks</title>
                                 <sort_order>20</sort_order>
-                                <action>mailup/adminhtml_mailupbackend</action>
+                                <action>adminhtml/mailup_mailupbackend</action>
                             </mailup_jobs>
                             <mailup_sync module="mailup">
                                 <title>View Task Data</title>
                                 <sort_order>30</sort_order>
-                                <action>mailup/adminhtml_sync</action>
+                                <action>adminhtml/mailup_sync</action>
                             </mailup_sync>
                             <mailup_log module="mailup">
                                 <title>View Logs</title>
                                 <sort_order>40</sort_order>
-                                <action>mailup/adminhtml_log</action>
+                                <action>adminhtml/mailup_log</action>
                             </mailup_log>
                         </children>
                     </mailup>

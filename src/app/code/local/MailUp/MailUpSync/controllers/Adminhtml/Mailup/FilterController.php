@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . "/../../Model/Wssend.php";
 /**
  * FilterController.php
  */
-class MailUp_MailUpSync_Adminhtml_FilterController extends Mage_Adminhtml_Controller_Action
+class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml_Controller_Action
 {
     /**
      * split customers into batches

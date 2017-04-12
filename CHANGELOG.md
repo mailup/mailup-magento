@@ -1,6 +1,8 @@
 CHANGELOG
 =========
 
+- [fix] APPSEC-1034 magento patch
+
 ## 2.7.3
 - [fix] SUPEE-6788 | Fix access for non-admin user to config section
 

@@ -1,5 +1,5 @@
 <?php
-class MailUp_MailUpSync_Adminhtml_MailupbackendController extends Mage_Adminhtml_Controller_Action
+class MailUp_MailUpSync_Adminhtml_Mailup_MailupbackendController extends Mage_Adminhtml_Controller_Action
 {
     /**
      * Default Action
