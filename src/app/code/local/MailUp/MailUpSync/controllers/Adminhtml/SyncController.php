@@ -34,4 +34,9 @@ class MailUp_MailUpSync_Adminhtml_SyncController extends Mage_Adminhtml_Controll
 
         $this->_redirect('*/*/index');
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_sync');
+    }
 }

@@ -6,7 +6,7 @@ MailUp is your complete email delivery solution. It combines strong campaign man
 We are working for a brand new extension. Thank you for your patience.
 
 ## Stable version
-2.7.2
+2.7.3
 
 ## Magento version
 
@@ -14,7 +14,7 @@ We are working for a brand new extension. Thank you for your patience.
 - CE 1.6.x
 - CE 1.7.x
 - CE 1.8.x
-- CE 1.9.x
+- CE 1.9.x (last version tested 1.9.2.4)
 
 ## Install via
 - composer

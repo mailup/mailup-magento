@@ -27,4 +27,9 @@ class MailUp_MailUpSync_Adminhtml_FieldsMappingController extends Mage_Adminhtml
 
         $this->_redirect('*/*');
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_fieldsmapping');
+    }
 }

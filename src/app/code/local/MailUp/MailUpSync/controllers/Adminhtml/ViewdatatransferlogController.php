@@ -11,4 +11,9 @@ class MailUp_MailUpSync_Adminhtml_ViewdatatransferlogController extends Mage_Adm
 	public function searchAction() {
 		$this->loadLayout()->renderLayout();
 	}
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_viewdatatransferlog');
+    }
 }

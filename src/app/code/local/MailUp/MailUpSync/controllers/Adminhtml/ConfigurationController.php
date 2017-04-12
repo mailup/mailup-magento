@@ -82,4 +82,9 @@ class MailUp_MailUpSync_Adminhtml_ConfigurationController extends Mage_Adminhtml
         $output = '<ul class="messages">' . implode("\n", $renderedMessages) . '</ul>';
         $this->getResponse()->setBody($output);
     }
+
+    protected function _isAllowed()
+	{
+		return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_configuration');
+	}
 }

@@ -452,4 +452,9 @@ class MailUp_MailUpSync_Adminhtml_FilterController extends Mage_Adminhtml_Contro
             die('no access key returned');
         }
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_filters');
+    }
 }
