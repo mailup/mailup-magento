@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname(__FILE__) . "/../../Model/MailUpWsImport.php";
-require_once dirname(__FILE__) . "/../../Model/Wssend.php";
-class MailUp_MailUpSync_Adminhtml_ConfigurationController extends Mage_Adminhtml_Controller_Action
+require_once dirname(__FILE__) . "/../../../Model/MailUpWsImport.php";
+require_once dirname(__FILE__) . "/../../../Model/Wssend.php";
+class MailUp_MailUpSync_Adminhtml_Mailup_ConfigurationController extends Mage_Adminhtml_Controller_Action
 {
 	public function indexAction()
 	{

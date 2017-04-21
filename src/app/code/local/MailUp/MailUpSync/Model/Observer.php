@@ -334,7 +334,7 @@ class MailUp_MailUpSync_Model_Observer
 
 		if (!strlen($url_console) or !strlen($user) or !strlen($password) or !strlen($list)) {
 			$url = Mage::getModel('adminhtml/url');
-			$url = $url->getUrl("mailup/adminhtml_configuration");
+			$url = $url->getUrl("adminhtml/mailup_configuration");
 			$message = Mage::helper("mailup")->__('MailUp configuration is not complete');
 			$message = str_replace("href=''", "href='$url'", $message);
 			Mage::getSingleton('adminhtml/session')->addWarning($message);
@@ -346,7 +346,7 @@ class MailUp_MailUpSync_Model_Observer
 		$mapping = $wsimport->getFieldsMapping();
 		if (empty($mapping)) {
 			$url = Mage::getModel('adminhtml/url');
-			$url = $url->getUrl("mailup/adminhtml_configuration");
+			$url = $url->getUrl("adminhtml/mailup_configuration");
 			$message = Mage::helper("mailup")->__('MailUp fields mapping is not complete');
 			$message = str_replace("href=''", "href='$url'", $message);
 			Mage::getSingleton('adminhtml/session')->addWarning($message);
