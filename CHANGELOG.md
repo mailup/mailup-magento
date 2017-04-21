@@ -1,6 +1,7 @@
 CHANGELOG
 =========
 
+## 2.7.4
 - [fix] APPSEC-1034 magento patch
 
 ## 2.7.3
