@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+## 2.7.5 - 10/07/2017
+- [dev] ip filter | send client ip for spam checking
+- [fix] SUPEE-6788 | Fix adminhtml url
+
 ## 2.7.4
 - [fix] APPSEC-1034 magento patch
 
