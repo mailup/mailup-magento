@@ -26,3 +26,9 @@ mailup/magento
 Any contribution to the development is welcome. The best possibility to provide any code is to open a [pull request on GitHub](https://help.github.com/articles/using-pull-requests).
 <br />
 You can also open an issue to advice any kind of error.
+
+---
+
+### Privacy Policy
+
+Please look at *privacy_policy.md*
