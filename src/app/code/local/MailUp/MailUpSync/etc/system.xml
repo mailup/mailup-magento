@@ -40,7 +40,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>It's the domain portion of the URL to your MailUp Admin console (e.g. g4a0.s03.it)</comment>
-	                        <backend_model>mailup/consoleurlvalidator</backend_model>
+	                        <backend_model>mailup/adminhtml_system_config_consoleurlvalidator</backend_model>
                         </url_console>
                         <username_ws translate="label comment">
                             <label>Web Service Username</label>
@@ -49,7 +49,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-	                        <backend_model>mailup/webserviceusernamevalidator</backend_model>
+	                        <backend_model>mailup/adminhtml_system_config_webserviceusernamevalidator</backend_model>
                         </username_ws>
                         <password_ws translate="label comment">
                             <label>Web Service Password</label>
@@ -58,6 +58,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <backend_model>mailup/adminhtml_system_config_webservicepwdvalidator</backend_model>
                             <comment>For assistance visit http://help.mailup.com/x/PgAy</comment>
                         </password_ws>
                         <check translate="label">

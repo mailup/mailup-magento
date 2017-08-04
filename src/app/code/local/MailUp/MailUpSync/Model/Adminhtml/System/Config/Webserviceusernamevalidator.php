@@ -1,6 +1,9 @@
 <?php
+/**
+ * Moved from MailUp_MailUpSync_Model_Webserviceusernamevalidator
+ */
 
-class MailUp_MailUpSync_Model_Webserviceusernamevalidator  extends Mage_Core_Model_Config_Data
+class MailUp_MailUpSync_Model_Adminhtml_System_Config_Webserviceusernamevalidator extends Mage_Core_Model_Config_Data
 {
 	public function save()
 	{
