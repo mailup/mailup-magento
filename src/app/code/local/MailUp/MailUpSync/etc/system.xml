@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
-<config>    
-<!-- Top Level Tabs -->
+<config>
+    <!-- Top Level Tabs -->
     <tabs>
         <mailup_tab translate="label" module="mailup">
             <label>MailUP</label>
@@ -9,7 +9,7 @@
             <sort_order>300</sort_order>
         </mailup_tab>
     </tabs>
-    
+
     <sections>
         <mailup_newsletter>
             <class>mailup-tab</class>
@@ -40,7 +40,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>It's the domain portion of the URL to your MailUp Admin console (e.g. g4a0.s03.it)</comment>
-	                        <backend_model>mailup/adminhtml_system_config_consoleurlvalidator</backend_model>
+                            <backend_model>mailup/adminhtml_system_config_consoleurlvalidator</backend_model>
                         </url_console>
                         <username_ws translate="label comment">
                             <label>Web Service Username</label>
@@ -49,7 +49,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-	                        <backend_model>mailup/adminhtml_system_config_webserviceusernamevalidator</backend_model>
+                            <backend_model>mailup/adminhtml_system_config_webserviceusernamevalidator</backend_model>
                         </username_ws>
                         <password_ws translate="label comment">
                             <label>Web Service Password</label>
@@ -61,6 +61,16 @@
                             <backend_model>mailup/adminhtml_system_config_webservicepwdvalidator</backend_model>
                             <comment>For assistance visit http://help.mailup.com/x/PgAy</comment>
                         </password_ws>
+                        <skip_check tranlate="label comment">
+                            <label>Disable Test Console Connection</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[<strong style="color: red">Attention!</strong> Use only temporarily if you receive 'Error in console URL' but your MailUp console works normally.]]></comment>
+                        </skip_check>
                         <check translate="label">
                             <label>Test Connection</label>
                             <frontend_type>button</frontend_type>
@@ -89,15 +99,15 @@
                             <show_in_store>1</show_in_store>
                             <comment>Used as default group in all subscriptions that do not have a manual group set</comment>
                         </default_group>
-	                    <enable_subscribe_in_checkout tranlate="label comment">
-		                    <label>Enable subscription checkbox during checkout</label>
-		                    <frontend_type>select</frontend_type>
-		                    <source_model>adminhtml/system_config_source_yesno</source_model>
-		                    <sort_order>70</sort_order>
+                        <enable_subscribe_in_checkout tranlate="label comment">
+                            <label>Enable subscription checkbox during checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-			            </enable_subscribe_in_checkout>
+                        </enable_subscribe_in_checkout>
                         <require_subscription_confirmation tranlate="label comment">
                             <label>Require Subscription Confirmation</label>
                             <frontend_type>select</frontend_type>
@@ -202,7 +212,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
                         </Name>
                         <Last translate="comment">
                             <label>Last</label>
@@ -212,7 +222,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <!--<comment>test..</comment>-->
-	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
                         </Last>
                         <Email translate="comment">
                             <label>Email</label>
@@ -221,7 +231,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
                         </Email>
                         <Company translate="comment">
                             <label>Company</label>
@@ -230,7 +240,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
                         </Company>
                         <Address translate="comment">
                             <label>Address</label>
@@ -239,7 +249,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-	                        <source_model>mailup/adminhtml_system_source_fields</source_model>
+                            <source_model>mailup/adminhtml_system_source_fields</source_model>
                         </Address>
                         <City translate="comment">
                             <label>City</label>
