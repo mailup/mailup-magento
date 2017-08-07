@@ -22,55 +22,59 @@ class MailUp_MailUpSync_Model_Observer
      */
     public function saveSystemConfig($observer)
     {
-        Mage::getSingleton('adminhtml/session')->setMessages(Mage::getModel('core/message_collection'));
+        $controller = $observer->getControllerAction();
+        $params = $controller->getRequest()->getParams();
 
-	    Mage::getModel('core/config_data')
-		    ->load(self::CRON_STRING_PATH, 'path')
-		    ->setValue($this->_getSchedule())
-		    ->setPath(self::CRON_STRING_PATH)
-		    ->save();
-        
-	    Mage::app()->cleanCache();
-        
-	    $this->configCheck();
+        if($params['section'] == 'mailup_newsletter') {
+            Mage::getSingleton('adminhtml/session')->setMessages(Mage::getModel('core/message_collection'));
 
-        // If there are errors in config, do not progress further as it may be testing old data
-        $currentMessages = Mage::getSingleton('adminhtml/session')->getMessages();
-        foreach ($currentMessages->getItems() as $msg) {
-            if ($msg->getType() != 'success') {
-                return;
+            Mage::getModel('core/config_data')
+                ->load(self::CRON_STRING_PATH, 'path')
+                ->setValue($this->_getSchedule())
+                ->setPath(self::CRON_STRING_PATH)
+                ->save();
+
+            Mage::app()->cleanCache();
+
+            $this->configCheck();
+
+            // If there are errors in config, do not progress further as it may be testing old data
+            $currentMessages = Mage::getSingleton('adminhtml/session')->getMessages();
+            foreach($currentMessages->getItems() as $msg) {
+                if($msg->getType() != 'success') {
+                    return;
+                }
+            }
+
+            $messages = array();
+
+            // Close connection to avoid mysql gone away errors
+            $res = Mage::getSingleton('core/resource');
+            $res->getConnection('core_write')->closeConnection();
+
+            // Test connection
+            $storeId    = Mage::app()->getStore();
+            $urlConsole = Mage::getStoreConfig('mailup_newsletter/mailup/url_console');
+            $usernameWs = Mage::getStoreConfig('mailup_newsletter/mailup/username_ws');
+            $passwordWs = Mage::getStoreConfig('mailup_newsletter/mailup/password_ws');
+            $retConn    = Mage::helper('mailup')->testConnection($urlConsole, $usernameWs, $passwordWs, $storeId);
+            $messages   = array_merge($messages, $retConn);
+
+            // Config tests
+            $retConfig = Mage::helper('mailup')->testConfig();
+            $messages  = array_merge($messages, $retConfig);
+
+            // Re-open connection to avoid mysql gone away errors
+            $res->getConnection('core_write')->getConnection();
+
+            // Add messages from test
+            if(count($messages) > 0) {
+                foreach($messages as $msg) {
+                    $msgObj = Mage::getSingleton('core/message')->$msg['type']($msg['message']);
+                    Mage::getSingleton('adminhtml/session')->addMessage($msgObj);
+                }
             }
         }
-
-        $messages = array();
-
-        // Close connection to avoid mysql gone away errors
-        $res = Mage::getSingleton('core/resource');
-        $res->getConnection('core_write')->closeConnection();
-
-        // Test connection
-        $storeId = Mage::app()->getStore();
-        $urlConsole = Mage::getStoreConfig('mailup_newsletter/mailup/url_console');
-        $usernameWs = Mage::getStoreConfig('mailup_newsletter/mailup/username_ws');
-        $passwordWs = Mage::getStoreConfig('mailup_newsletter/mailup/password_ws');
-        $retConn = Mage::helper('mailup')->testConnection($urlConsole, $usernameWs, $passwordWs, $storeId);
-        $messages = array_merge($messages, $retConn);
-
-        // Config tests
-        $retConfig = Mage::helper('mailup')->testConfig();
-        $messages = array_merge($messages, $retConfig);
-
-        // Re-open connection to avoid mysql gone away errors
-        $res->getConnection('core_write')->getConnection();
-
-        // Add messages from test
-        if (count($messages) > 0) {
-            foreach ($messages as $msg) {
-                $msgObj = Mage::getSingleton('core/message')->$msg['type']($msg['message']);
-                Mage::getSingleton('adminhtml/session')->addMessage($msgObj);
-            }
-        }
-
     }
 
     /**
@@ -330,20 +334,21 @@ class MailUp_MailUpSync_Model_Observer
      */
 	public function configCheck()
 	{
-		$url_console = Mage::getStoreConfig('mailup_newsletter/mailup/url_console');
-		$user = Mage::getStoreConfig('mailup_newsletter/mailup/username_ws');
-		$password = Mage::getStoreConfig('mailup_newsletter/mailup/password_ws');
-		$list = Mage::getStoreConfig('mailup_newsletter/mailup/list');
-
-		if (!strlen($url_console) or !strlen($user) or !strlen($password) or !strlen($list)) {
-			$url = Mage::getModel('adminhtml/url');
-			$url = $url->getUrl("adminhtml/mailup_configuration");
-			$message = Mage::helper("mailup")->__('MailUp configuration is not complete');
-			$message = str_replace("href=''", "href='$url'", $message);
-			Mage::getSingleton('adminhtml/session')->addWarning($message);
-			
-            return;
-		}
+	    /** @deprecated after 2.7.5 **/
+		//$url_console = Mage::getStoreConfig('mailup_newsletter/mailup/url_console');
+		//$user = Mage::getStoreConfig('mailup_newsletter/mailup/username_ws');
+		//$password = Mage::getStoreConfig('mailup_newsletter/mailup/password_ws');
+		//$list = Mage::getStoreConfig('mailup_newsletter/mailup/list');
+        //
+		//if (!strlen($url_console) or !strlen($user) or !strlen($password) or !strlen($list)) {
+		//	$url = Mage::getModel('adminhtml/url');
+		//	$url = $url->getUrl("adminhtml/mailup_configuration");
+		//	$message = Mage::helper("mailup")->__('MailUp configuration is not complete');
+		//	$message = str_replace("href=''", "href='$url'", $message);
+		//	Mage::getSingleton('adminhtml/session')->addWarning($message);
+		//
+         //   return;
+		//}
 
 		$wsimport = new MailUpWsImport();
 		$mapping = $wsimport->getFieldsMapping();
