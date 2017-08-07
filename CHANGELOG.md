@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+- [fix] admin config | close save config only to mailup section
+- [fix] admin config | refactoring field check
+- [dev] admin config | add skip test console url option
+
 ## 2.7.5 - 10/07/2017
 - [dev] ip filter | send client ip for spam checking
 - [fix] SUPEE-6788 | Fix adminhtml url
