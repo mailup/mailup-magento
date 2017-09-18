@@ -8,15 +8,15 @@ $allmagentofields = array(
     "LatestShippedOrderDate", "LatestShippedOrderID", "LatestAbandonedCartDate", "LatestAbandonedCartTotal", 
     "LatestAbandonedCartID", "TotalOrdered", "TotalOrderedLast12m", "TotalOrderedLast30d", "AllOrderedProductIDs"
 );
-$wsSend = new MailUpWsSend();
+$wsSend = new Mailup_MailUpWsSend();
 $accessKey = $wsSend->loginFromId();
 
 if ($accessKey === false) {
     echo $this->__('WARNING: before proceeding you must correctly configure the settings of MailUp access in System->Configuration->Newsletter->MailUp');
 } else {
-    $wsImport = new MailUpWsImport();
-	
-	$wsSend = new MailUpWsSend();
+    $wsImport = new Mailup_MailUpWsImport();
+	$wsSend = new Mailup_MailUpWsSend();
+
 	// campi che arrivano da mailup
 	$wsFields = $wsSend->getFields($accessKey);
     //carico i mapping salvati

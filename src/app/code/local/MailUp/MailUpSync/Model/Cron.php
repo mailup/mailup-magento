@@ -4,8 +4,6 @@
  * 
  * Scheduled Task handler.
  */
-require_once dirname(__FILE__) . "/MailUpWsImport.php";
-require_once dirname(__FILE__) . "/Wssend.php";
 
 class MailUp_MailUpSync_Model_Cron
 {

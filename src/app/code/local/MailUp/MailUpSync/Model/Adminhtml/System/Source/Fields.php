@@ -28,26 +28,23 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Source_Fields
     public function toOptionArray()
     {
         // If in this instantiation of Mage options have been fetched, return them, bypassing even cache
-        if ($this->_options !== null) {
+        if($this->_options !== null) {
             return $this->_options;
         }
         $websiteCode = Mage::app()->getRequest()->getParam('website');
-        $storeCode = Mage::app()->getRequest()->getParam('store');
-        
+        $storeCode   = Mage::app()->getRequest()->getParam('store');
+
         if($storeCode) {
             $storeId = Mage::app()->getStore($storeCode)->getId();
             $cacheId = 'mailup_fields_array_store_'.$storeId;
-        }
-        elseif($websiteCode) {
+        } elseif($websiteCode) {
             $storeId = Mage::app()
-                ->getWebsite($websiteCode)
-                ->getDefaultGroup()
-                ->getDefaultStoreId()
-            ;
+                           ->getWebsite($websiteCode)
+                           ->getDefaultGroup()
+                           ->getDefaultStoreId();
             $cacheId = 'mailup_fields_array_store_'.$storeId;
-        }
-        else {
-            $storeId = NULL;
+        } else {
+            $storeId = null;
             $cacheId = 'mailup_fields_array';
             //$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
         }
@@ -56,16 +53,16 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Source_Fields
         $options = array(array('value' => '', 'label' => ''));
 
         // Attempt to fetch options from cache (handles invalidation after CACHE_LIFETIME)
-        if (false !== ($data = Mage::app()->getCache()->load($cacheId))) {
+        if(false !== ($data = Mage::app()->getCache()->load($cacheId))) {
             $options = unserialize($data);
         } else {
             // If cache is invalid, make request to MailUp via API
-            $wsSend = new MailUpWsSend($storeId);
+            $wsSend    = new Mailup_MailUpWsSend($storeId);
             $accessKey = $wsSend->loginFromId();
-            if ($accessKey !== false) {
+            if($accessKey !== false) {
                 $wsFields = $wsSend->getFields($accessKey);
-                if ($wsFields !== null) {
-                    foreach ($wsFields as $label => $value) {
+                if($wsFields !== null) {
+                    foreach($wsFields as $label => $value) {
                         $options[] = array(
                             'value' => $value,
                             'label' => $label, //Mage::helper('adminhtml')->__($label)

@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__FILE__) . "/MailUpWsImport.php";
-
 class MailUp_MailUpSync_Model_Observer
 {
 	const CRON_STRING_PATH  = 'crontab/jobs/mailup_mailupsync/schedule/cron_expr';
@@ -350,7 +348,7 @@ class MailUp_MailUpSync_Model_Observer
          //   return;
 		//}
 
-		$wsimport = new MailUpWsImport();
+		$wsimport = new Mailup_MailUpWsImport();
 		$mapping = $wsimport->getFieldsMapping();
 		if (empty($mapping)) {
 			$url = Mage::getModel('adminhtml/url');

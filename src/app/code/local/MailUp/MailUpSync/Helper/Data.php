@@ -1,8 +1,5 @@
 <?php
 
-require_once dirname(__DIR__)."/Model/MailUpWsImport.php";
-require_once dirname(__DIR__)."/Model/Wssend.php";
-
 /**
  * Data.php
  *
@@ -347,9 +344,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $config = Mage::getModel('mailup/config');
         /* @var $config MailUp_MailUpSync_Model_Config */
 
-        $wsSend = new MailUpWsSend($storeId);
-        require_once dirname(__FILE__)."/../Model/MailUpWsImport.php";
-        $wsImport  = new MailUpWsImport($storeId);
+        $wsSend = new Mailup_MailUpWsSend($storeId);
+        $wsImport  = new Mailup_MailUpWsImport($storeId);
         $accessKey = $wsSend->loginFromId();
 
         if(empty($mailupCustomerIds)) {
@@ -1049,7 +1045,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getListGuid($listId)
     {
-        $wsImport  = new MailUpWsImport();
+        $wsImport  = new Mailup_MailUpWsImport();
         $xmlString = $wsImport->GetNlList();
         if(!$xmlString) return $this;
 
@@ -1227,7 +1223,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _testConnectionUserPassword($usernameWs, $passwordWs, $storeId)
     {
-        $wssend = new MailUpWsSend($storeId);
+        $wssend = new Mailup_MailUpWsSend($storeId);
 
         $loginSuccess = $wssend->loginFromId($usernameWs, $passwordWs);
 

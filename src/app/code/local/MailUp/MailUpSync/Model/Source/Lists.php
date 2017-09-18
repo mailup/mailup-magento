@@ -1,9 +1,4 @@
 <?php
-/**
- * Lists.php
- */
-require_once dirname(__DIR__) . "/MailUpWsImport.php";
-require_once dirname(__DIR__) . "/Wssend.php";
 
 class MailUp_MailUpSync_Model_Source_Lists
 {
@@ -11,45 +6,41 @@ class MailUp_MailUpSync_Model_Source_Lists
      * @var array
      */
     protected $_cache = array();
-    
+
     /**
      * Get as options
-     * 
+     *
      * array(
      *     array(
-     *          'value'     => (string)$list['idList'], 
-                'label'     => (string)$list['listName'], 
-                'guid'      =>(string)$list['listGUID'], 
-                "groups"    => array(
+     *          'value'     => (string)$list['idList'],
+     * 'label'     => (string)$list['listName'],
+     * 'guid'      =>(string)$list['listGUID'],
+     * "groups"    => array(
      *           ...
      *          )
      *     )
      * )
-     * 
+     *
      * @return  array
      */
-    public function toOptionArray($storeId = NULL) 
+    public function toOptionArray($storeId = null)
     {
         $websiteCode = Mage::app()->getRequest()->getParam('website');
-        $storeCode = Mage::app()->getRequest()->getParam('store');
-        
-        if(isset($storeId) && $storeId != FALSE) {
+        $storeCode   = Mage::app()->getRequest()->getParam('store');
+
+        if(isset($storeId) && $storeId != false) {
             $storeId = $storeId; // ?
-        }
-        elseif($storeCode) {
+        } elseif($storeCode) {
             $storeId = Mage::app()->getStore($storeCode)->getId();
             $cacheId = 'mailup_fields_array_store_'.$storeId;
-        }
-        elseif($websiteCode) {
+        } elseif($websiteCode) {
             $storeId = Mage::app()
-                ->getWebsite($websiteCode)
-                ->getDefaultGroup()
-                ->getDefaultStoreId()
-            ;
+                           ->getWebsite($websiteCode)
+                           ->getDefaultGroup()
+                           ->getDefaultStoreId();
             $cacheId = 'mailup_fields_array_store_'.$storeId;
-        }
-        else {
-            $storeId = NULL;
+        } else {
+            $storeId = null;
             $cacheId = 'mailup_fields_array';
             //$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
         }
@@ -57,52 +48,53 @@ class MailUp_MailUpSync_Model_Source_Lists
         // Create select
         $selectLists = array();
 
-        if (Mage::getStoreConfig('mailup_newsletter/mailup/url_console', $storeId) 
-            && Mage::getStoreConfig('mailup_newsletter/mailup/username_ws', $storeId) 
-            && Mage::getStoreConfig('mailup_newsletter/mailup/password_ws', $storeId)) {
-            
-            $wsSend = new MailUpWsSend($storeId);
+        if(Mage::getStoreConfig('mailup_newsletter/mailup/url_console', $storeId)
+            && Mage::getStoreConfig('mailup_newsletter/mailup/username_ws', $storeId)
+            && Mage::getStoreConfig('mailup_newsletter/mailup/password_ws', $storeId)
+        ) {
+
+            $wsSend    = new Mailup_MailUpWsSend($storeId);
             $accessKey = $wsSend->loginFromId();
-            
-            if ($accessKey !== false) {
-	            require_once dirname(__DIR__) . "/MailUpWsImport.php";
-                $wsImport = new MailUpWsImport($storeId);
-                
+
+            if($accessKey !== false) {
+                $wsImport = new Mailup_MailUpWsImport($storeId);
+
                 $xmlString = $wsImport->GetNlList();
 
-                $selectLists[0] = array('value' => 0, 'label'=>'-- Select a list (if any) --');
+                $selectLists[0] = array('value' => 0, 'label' => '-- Select a list (if any) --');
 
                 if($xmlString) {
-                    $xmlString = html_entity_decode($xmlString);
+                    $xmlString  = html_entity_decode($xmlString);
                     $startLists = strpos($xmlString, '<Lists>');
-                    if ($startLists === false) {
-                        if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
+                    if($startLists === false) {
+                        if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
                             Mage::log('MailUpWsImport failed even though login succeeded');
+
                         return $selectLists;
                     }
-                    $endPos = strpos($xmlString, '</Lists>');
+                    $endPos   = strpos($xmlString, '</Lists>');
                     $endLists = $endPos + strlen('</Lists>') - $startLists;
                     $xmlLists = substr($xmlString, $startLists, $endLists);
                     $xmlLists = str_replace("&", "&amp;", $xmlLists);
-                    $xml = simplexml_load_string($xmlLists);
-                    $count = 1;
-                    foreach ($xml->List as $list) {
-						$groups = array();
-						foreach ($list->Groups->Group as $tmp) {
-							$groups[(string)$tmp["idGroup"]] = (string)$tmp["groupName"];
-						}
+                    $xml      = simplexml_load_string($xmlLists);
+                    $count    = 1;
+                    foreach($xml->List as $list) {
+                        $groups = array();
+                        foreach($list->Groups->Group as $tmp) {
+                            $groups[(string)$tmp["idGroup"]] = (string)$tmp["groupName"];
+                        }
                         $selectLists[$count] = array(
-                            'value'     => (string)$list['idList'], 
-                            'label'     => (string)$list['listName'], 
-                            'guid'      =>(string)$list['listGUID'], 
-                            "groups"    => $groups
+                            'value'  => (string)$list['idList'],
+                            'label'  => (string)$list['listName'],
+                            'guid'   => (string)$list['listGUID'],
+                            "groups" => $groups
                         );
                         $count++;
                     }
                 }
             } else {
-                if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId)) Mage::log('LoginFromId failed');
-                $selectLists[0] = array('value' => 0, 'label'=>$GLOBALS["__sl_mailup_login_error"]);
+                if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId)) Mage::log('LoginFromId failed');
+                $selectLists[0] = array('value' => 0, 'label' => $GLOBALS["__sl_mailup_login_error"]);
             }
         }
 
@@ -114,92 +106,98 @@ class MailUp_MailUpSync_Model_Source_Lists
      *
      * @param $listId
      * @param $storeId
+     *
      * @return bool|array
      */
-    public function getListDataArray($listId, $storeId) 
+    public function getListDataArray($listId, $storeId)
     {
         $listData = $this->getDataArray($storeId);
-        if (isset($listData[$listId])) {
-           return $listData[$listId];
+        if(isset($listData[$listId])) {
+            return $listData[$listId];
         }
 
         // If list not found, return false
-        if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId)) {
-            Mage::log('Invalid List ID: ' . $listId);
+        if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId)) {
+            Mage::log('Invalid List ID: '.$listId);
         }
 
         return false;
     }
-    
+
     /**
      * Get an array of all lists, and their groups!
      *
      * @param string $storeId
+     *
      * @return  array
      */
-    public function getDataArray($storeId) 
+    public function getDataArray($storeId)
     {
         $selectLists = array();
 
         // If cache is set, use that
-        if (isset($this->_cache[$storeId])) {
+        if(isset($this->_cache[$storeId])) {
             return $this->_cache[$storeId];
         }
 
         // If login details not set, return empty list
-        if (!$this->_config()->getUrlConsole($storeId) ||
-                !$this->_config()->getUsername($storeId) ||
-                !$this->_config()->getPassword($storeId)) {
-            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
+        if(!$this->_config()->getUrlConsole($storeId) ||
+            !$this->_config()->getUsername($storeId) ||
+            !$this->_config()->getPassword($storeId)
+        ) {
+            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
                 Mage::log('Login details not complete - cannot retrieve lists');
+
             return $selectLists;
         }
 
         // Attempt login (return empty if fails)
-        $wsSend = new MailUpWsSend($storeId);
+        $wsSend    = new Mailup_MailUpWsSend($storeId);
         $accessKey = $wsSend->loginFromId();
-        if ($accessKey === false) {
-            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
+        if($accessKey === false) {
+            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
                 Mage::log('Login failed - cannot retrieve lists');
+
             return $selectLists;
         }
 
         // Attempt to make call to get lists from API
-        require_once dirname(__DIR__) . "/MailUpWsImport.php";
-        $wsImport = new MailUpWsImport($storeId);
+        $wsImport  = new Mailup_MailUpWsImport($storeId);
         $xmlString = $wsImport->GetNlList();
-        if (!$xmlString) {
-            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
+        if(!$xmlString) {
+            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
                 Mage::log('MailUpWsImport got empty response when fetching lists even though login succeeded');
+
             return $selectLists;
         }
 
         // Try to decode response. If <Lists> is not in selection, then return
-        $xmlString = html_entity_decode($xmlString);
+        $xmlString  = html_entity_decode($xmlString);
         $startLists = strpos($xmlString, '<Lists>');
         // On XML error, $startLists will fail
-        if ($startLists === false) {
-            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
+        if($startLists === false) {
+            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
                 Mage::log('MailUpWsImport got error response when fetching lists');
+
             return $selectLists;
         }
 
         // Extract lists and their groups from <List> section of response
-        $endPos = strpos($xmlString, '</Lists>');
+        $endPos   = strpos($xmlString, '</Lists>');
         $endLists = $endPos + strlen('</Lists>') - $startLists;
         $xmlLists = substr($xmlString, $startLists, $endLists);
         $xmlLists = str_replace("&", "&amp;", $xmlLists);
-        $xml = simplexml_load_string($xmlLists);
-        foreach ($xml->List as $list) {
+        $xml      = simplexml_load_string($xmlLists);
+        foreach($xml->List as $list) {
             $groups = array();
-            foreach ($list->Groups->Group as $tmp) {
+            foreach($list->Groups->Group as $tmp) {
                 $groups[(string)$tmp["idGroup"]] = (string)$tmp["groupName"];
             }
             $selectLists[(string)$list['idList']] = array(
-                'idList' => (string)$list['idList'],
+                'idList'   => (string)$list['idList'],
                 'listName' => (string)$list['listName'],
                 'listGUID' => (string)$list['listGUID'],
-                "groups" => $groups
+                "groups"   => $groups
             );
         }
 
@@ -208,57 +206,58 @@ class MailUp_MailUpSync_Model_Source_Lists
 
         return $selectLists;
     }
-    
+
     /**
      * Get a List Guid
-     * 
+     *
      * @param   int
      * @param   int
+     *
      * @return  string|false
      */
     public function getListGuid($listId, $storeId)
     {
         $listData = $this->getListDataArray($listId, $storeId);
 
-        if ($listData === false || !isset($listData['listGUID'])) {
+        if($listData === false || !isset($listData['listGUID'])) {
             return false;
         }
-        
+
         return $listData['listGUID'];
     }
-    
+
     /**
      * Get the groups for a given list.
-     * 
+     *
      * @param   int|false
      */
     public function getListGroups($listId, $storeId)
     {
         $listData = $this->getListDataArray($listId, $storeId);
 
-        if ($listData === false || !isset($listData['groups'])) {
+        if($listData === false || !isset($listData['groups'])) {
             return false;
         }
-        
+
         return $listData['groups'];
     }
-    
+
     /**
      * @var MailUp_MailUpSync_Model_Config
      */
     protected $_config;
-    
+
     /**
      * Get the config
-     * 
+     *
      * @reutrn MailUp_MailUpSync_Model_Config
      */
     protected function _config()
-    {        
-        if(NULL === $this->_config) {
+    {
+        if(null === $this->_config) {
             $this->_config = Mage::getModel('mailup/config');
         }
-        
+
         return $this->_config;
     }
 }

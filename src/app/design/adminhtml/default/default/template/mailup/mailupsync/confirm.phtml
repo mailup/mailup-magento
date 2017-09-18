@@ -8,7 +8,7 @@ if(empty($storeId)) {
 }
 
 //ottengo l'elenco delle liste e dei gruppi da mailup
-$wsImport = new MailUpWsImport($storeId);
+$wsImport = new Mailup_MailUpWsImport($storeId);
 
 $customersFiltered = $wsImport->getCustomersFiltered($this, $storeId);
 

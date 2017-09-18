@@ -195,7 +195,6 @@
     <default>
         <mailup_newsletter>
             <mailup>
-                <model>mailup/ws</model>
                 <disablenewslettersuccesses>1</disablenewslettersuccesses>
                 <require_subscription_confirmation>1</require_subscription_confirmation>
                 <enable_testmode>0</enable_testmode>
