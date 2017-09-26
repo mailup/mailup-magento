@@ -10,9 +10,10 @@ class MailUp_MailUpSync_Block_Adminhtml_System_Config_Form_Testbutton
      * Return element html
      *
      * @param  Varien_Data_Form_Element_Abstract $element
+     *
      * @return string
      */
-    protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
+    protected function _getElementHtml()
     {
         return $this->_toHtml();
     }
@@ -24,11 +25,14 @@ class MailUp_MailUpSync_Block_Adminhtml_System_Config_Form_Testbutton
      */
     protected function _toHtml()
     {
-        $button = $this->getLayout()->createBlock('adminhtml/widget_button')
-            ->setData(array(
-                'id'        => 'mailup_selftest_button',
-                'label'     => $this->helper('adminhtml')->__('Test Connection')
-            ));
+        $button = $this->getLayout()
+                       ->createBlock('adminhtml/widget_button')
+                       ->setData(
+                           array(
+                               'id'    => 'mailup_selftest_button',
+                               'label' => $this->helper('adminhtml')->__('Test Connection')
+                           )
+                       );
 
         return $button->toHtml();
     }

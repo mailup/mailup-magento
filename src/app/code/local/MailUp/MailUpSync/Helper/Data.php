@@ -40,14 +40,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
     public static function getCustomersData($customerCollection = null)
     {
         $config = Mage::getModel('mailup/config');
-        /* @var $config MailUp_MailUpSync_Model_Config */
 
-        if($config->isLogEnabled()) {
+        if ($config->isLogEnabled()) {
             $config->log('Getting customers data');
         }
 
-        if(is_array($customerCollection) && empty($customerCollection)) {
-            if($config->isLogEnabled()) {
+        if (is_array($customerCollection) && empty($customerCollection)) {
+            if ($config->isLogEnabled()) {
                 $config->log('CustomerCollection is Empty!');
             }
         }
@@ -59,34 +58,35 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         $parseSubscribers = false;
         $toSend           = array();
-        if($customerCollection === null) {
+        if ($customerCollection === null) {
             /**
              * @todo    Change to only load form current store/website
              */
             $customerCollection = Mage::getModel('customer/customer')->getCollection();
             $parseSubscribers   = true;
-            if($config->isLogEnabled()) {
+            if ($config->isLogEnabled()) {
                 $config->log('Parsing Subscribers, NULL collection passed.');
             }
         }
-        foreach($customerCollection as $currentCustomerId) {
-            if(is_object($currentCustomerId)) {
+
+        foreach ($customerCollection as $currentCustomerId) {
+            if (is_object($currentCustomerId)) {
                 $currentCustomerId = $currentCustomerId->getId();
             }
 
-            if(!$currentCustomerId) {
-                if($config->isLogEnabled()) {
+            if (!$currentCustomerId) {
+                if ($config->isLogEnabled()) {
                     $config->log('Skipping Empty Customer ID!');
                     continue;
                 }
             }
 
-            if($config->isLogEnabled()) {
+            if ($config->isLogEnabled()) {
                 $config->log('Customer with id '.$currentCustomerId);
             }
+
             $customer = Mage::getModel('customer/customer')->load($currentCustomerId);
-            /* @var $customer Mage_Customer_Model_Customer */
-            $i = $customer->getEmail();
+            $i        = $customer->getEmail();
 
             // Get order dates, numbers and totals for the current customer
             //TODO: This would be more efficient with just a few SQL statements to gather this
@@ -100,16 +100,17 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             $lastShipmentOrderId      = null;
             $lastShipmentOrderDate    = null;
 
-            if($config->isLogEnabled()) {
+            if ($config->isLogEnabled()) {
                 $config->log('Parsing orders of customer with id '.$currentCustomerId);
             }
+
             // Setup collection to fetch orders for this customer and valid statuses
             $orders = Mage::getResourceModel('sales/order_collection')
                           ->addAttributeToFilter('customer_id', $currentCustomerId);
             Mage::helper('mailup/order')->addStatusFilterToOrders($orders);
 
-            foreach($orders as $order) {
-                if($config->isLogEnabled()) {
+            foreach ($orders as $order) {
+                if ($config->isLogEnabled()) {
                     $config->log("ORDER STATUS: {$order->getState()} / {$order->getStatus()}");
                 }
 
@@ -118,10 +119,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 $allOrdersTotalAmount += $currentOrderTotal;
 
                 $currentOrderCreationDate = $order->getCreatedAt();
-                if($currentOrderCreationDate > $thirtyDaysAgo) {
+                if ($currentOrderCreationDate > $thirtyDaysAgo) {
                     $last30daysOrdersAmount += $currentOrderTotal;
                 }
-                if($currentOrderCreationDate > $twelveMonthsAgo) {
+
+                if ($currentOrderCreationDate > $twelveMonthsAgo) {
                     $last12monthsOrdersAmount += $currentOrderTotal;
                 }
 
@@ -131,13 +133,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 $allOrdersDateTimes[$currentOrderId] = $currentOrderCreationDate;
                 $allOrdersIds[$currentOrderId]       = $currentOrderId;
 
-                if($order->hasShipments() and ($order->getId() > $lastShipmentOrderId)) {
+                if ($order->hasShipments() and ($order->getId() > $lastShipmentOrderId)) {
                     $lastShipmentOrderId   = $order->getId();
                     $lastShipmentOrderDate = self::_retriveDateFromDatetime($order->getCreatedAt());
                 }
 
                 $items = $order->getAllItems();
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     $allProductsIds[] = $item->getProductId();
                 }
             }
@@ -151,37 +153,39 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             ksort($allOrdersIds);
 
             //recupero i carrelli abbandonati del cliente
-            if($config->isLogEnabled()) {
+            if ($config->isLogEnabled()) {
                 $config->log('Parsing abandoned carts of customer with id '.$currentCustomerId);
             }
+
             $cartCollection = Mage::getResourceModel('reports/quote_collection');
             $cartCollection->prepareForAbandonedReport($config->getAllStoreIds());
             $cartCollection->addFieldToFilter('customer_id', $currentCustomerId);
             $cartCollection->load();
 
             $datetimeCart = null;
-            if(!empty($cartCollection)) {
+            if (!empty($cartCollection)) {
                 $lastCart                                = $cartCollection->getLastItem();
                 $toSend[$i]['TotaleCarrelloAbbandonato'] = '';
                 $toSend[$i]['DataCarrelloAbbandonato']   = '';
                 $toSend[$i]['IDCarrelloAbbandonato']     = '';
 
-                if(!empty($lastCart)) {
-                    if($config->isLogEnabled()) {
+                if (!empty($lastCart)) {
+                    if ($config->isLogEnabled()) {
                         $config->log('Customer with id '.$currentCustomerId.' has abandoned cart');
                     }
+
                     $datetimeCart = $lastCart->getUpdatedAt();
                     //$toSend[$i]['TotaleCarrelloAbbandonato'] = self::_formatPrice($lastCart->getGrandTotal());
                     $toSend[$i]['TotaleCarrelloAbbandonato'] = self::_formatPrice($lastCart->getSubtotal());
                     $toSend[$i]['DataCarrelloAbbandonato']   = self::_retriveDateFromDatetime($datetimeCart);
                     $toSend[$i]['IDCarrelloAbbandonato']     = $lastCart->getId();
                 } else {
-                    if($config->isLogEnabled()) {
+                    if ($config->isLogEnabled()) {
                         $config->log('Customer with id '.$currentCustomerId.' has empty LAST CART');
                     }
                 }
             } else {
-                if($config->isLogEnabled()) {
+                if ($config->isLogEnabled()) {
                     $config->log('Customer id '.$currentCustomerId.' has empty abandoned cart collection');
                 }
             }
@@ -191,11 +195,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
             $lastOrderDateTime = end($allOrdersDateTimes);
 
-            if($customer->getUpdatedAt() > $lastDateTime
+            if ($customer->getUpdatedAt() > $lastDateTime
                 || $lastOrderDateTime > $lastDateTime
                 || ($datetimeCart && $datetimeCart > $lastDateTime)
             ) {
-                if($config->isLogEnabled()) {
+                if ($config->isLogEnabled()) {
                     $config->log('Adding customer with id '.$currentCustomerId);
                 }
 
@@ -206,17 +210,18 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
                 // Custom customer attributes
                 $customerAttributes = Mage::helper('mailup/customer')->getCustomCustomerAttrCollection();
-                foreach($customerAttributes as $attribute) {
+                foreach ($customerAttributes as $attribute) {
                     $code  = $attribute->getAttributeCode().'_custom_customer_attributes';
                     $value = $customer->getData($attribute->getAttributeCode());
-                    if($attribute->usesSource()) {
+                    if ($attribute->usesSource()) {
                         /* Attempt to get source model. As we cannot trust customers to have not leave broken
                            attributes with invalid source models around, we will test this directly */
                         $source = Mage::getModel($attribute->getSourceModel());
-                        if($source == false) {
-                            if($config->isLogEnabled()) {
+                        if ($source == false) {
+                            if ($config->isLogEnabled()) {
                                 $config->log('Invalid source model for attribute '.$attribute->getAttributeCode());
                             }
+
                             $toSend[$i][$code] = null;
                         } else {
                             $toSend[$i][$code] = $attribute->getSource()->getOptionText($value);
@@ -229,7 +234,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 $toSend[$i]['registeredDate'] = self::_retriveDateFromDatetime($customer->getCreatedAt());
 
                 //controllo se iscritto o meno alla newsletter
-                if(Mage::getModel('newsletter/subscriber')->loadByCustomer($customer)->isSubscribed()) {
+                if (Mage::getModel('newsletter/subscriber')->loadByCustomer($customer)->isSubscribed()) {
                     $toSend[$i]['subscribed'] = 'yes';
                 } else {
                     $toSend[$i]['subscribed'] = 'no';
@@ -237,7 +242,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
                 //recupero i dati dal default billing address
                 $customerAddressId = $customer->getDefaultBilling();
-                if($customerAddressId) {
+                if ($customerAddressId) {
                     $address                 = Mage::getModel('customer/address')->load($customerAddressId);
                     $toSend[$i]['azienda']   = $address->getData('company');
                     $toSend[$i]['paese']     = $address->getCountry();
@@ -274,21 +279,22 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 $items       = $lastOrder->getAllItems();
                 $productIds  = array();
                 $categoryIds = array();
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     $productId    = $item->getProductId();
                     $productIds[] = $productId;
                     $product      = Mage::getModel('catalog/product')->load($productId);
-                    if($product->getCategoryIds()) {
+                    if ($product->getCategoryIds()) {
                         $categoryIds[] = implode(',', $product->getCategoryIds());
                     }
                 }
 
                 $toSend[$i]['IDProdottiUltimoOrdine'] = implode(',', $productIds);
-                if($toSend[$i]['IDProdottiUltimoOrdine']) {
+                if ($toSend[$i]['IDProdottiUltimoOrdine']) {
                     $toSend[$i]['IDProdottiUltimoOrdine'] = ",{$toSend[$i]['IDProdottiUltimoOrdine']},";
                 }
+
                 $toSend[$i]['IDCategorieUltimoOrdine'] = implode(',', $categoryIds);
-                if($toSend[$i]['IDCategorieUltimoOrdine']) {
+                if ($toSend[$i]['IDCategorieUltimoOrdine']) {
                     $toSend[$i]['IDCategorieUltimoOrdine'] = ",{$toSend[$i]['IDCategorieUltimoOrdine']},";
                 }
             }
@@ -301,29 +307,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             unset($customer);
         }
 
-        /*
-         *  disabled cause useless in segmentation
-        if ($parseSubscribers) {
-            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) Mage::log('Parsing subscribers', 0);
-            $subscriberCollection = Mage::getModel('newsletter/subscriber')
-                ->getCollection()
-                ->useOnlySubscribed()
-                ->addFieldToFilter('customer_id', 0);
-
-            foreach ($subscriberCollection as $subscriber) {
-                $subscriber = Mage::getModel('newsletter/subscriber')->load($subscriber->getId());
-                $i = $subscriber->getEmail();
-                if (strlen($i)) continue;
-                if (isset($toSend[$i])) continue;
-                $toSend[$i]['nome'] = '';
-                $toSend[$i]['cognome'] = '';
-                $toSend[$i]['email'] = $i;
-                $toSend[$i]['subscribed'] = 'yes';
-            }
-        }
-        */
-
-        if($config->isLogEnabled()) {
+        if ($config->isLogEnabled()) {
             $config->log('End getting customers data');
         }
 
@@ -342,14 +326,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
     public static function generateAndSendCustomers($mailupCustomerIds, $post = null, $storeId = null)
     {
         $config = Mage::getModel('mailup/config');
-        /* @var $config MailUp_MailUpSync_Model_Config */
 
-        $wsSend = new Mailup_MailUpWsSend($storeId);
+        $wsSend    = new Mailup_MailUpWsSend($storeId);
         $wsImport  = new Mailup_MailUpWsImport($storeId);
         $accessKey = $wsSend->loginFromId();
 
-        if(empty($mailupCustomerIds)) {
-            if($config->isLogEnabled($storeId)) {
+        if (empty($mailupCustomerIds)) {
+            if ($config->isLogEnabled($storeId)) {
                 $config->log('generateAndSendCustomers [Empty Customer ID Array]');
             }
 
@@ -358,15 +341,14 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         $jobId    = $post['id'];
         $jobModel = Mage::getModel('mailup/job')->load($post['id']);
-        /* @var $jobModel MailUp_MailUpSync_Model_Job */
 
-        if($accessKey === false) {
+        if ($accessKey === false) {
             Mage::throwException('no access key returned');
         }
 
-        $fields_mapping = $wsImport->getFieldsMapping($storeId); // Pass StoreId
-        if(count($fields_mapping) == 0) {
-            if($config->isLogEnabled($storeId))
+        $fieldsMapping = $wsImport->getFieldsMapping($storeId); // Pass StoreId
+        if (empty($fieldsMapping)) {
+            if ($config->isLogEnabled($storeId))
                 $config->log('No mappings set, so cannot sync customers');
 
             return false;
@@ -380,7 +362,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         /**
          * Create a new Mailup Group.
          */
-        if($post['mailupNewGroup'] == 1) {
+        if ($post['mailupNewGroup'] == 1) {
             $newGroup = array(
                 "idList"       => $idList,
                 "listGUID"     => $listGUID,
@@ -390,7 +372,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // If message_id set, then pass this to define which message is sent to customers
-        if(isset($post['message_id']) && $post['message_id'] !== null) {
+        if (isset($post['message_id']) && $post['message_id'] !== null) {
             $idConfirmNL = $post['message_id'];
         } else {
             // Default to 0 (ignored)
@@ -413,23 +395,24 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             "idConfirmNL"     => $idConfirmNL
         );
 
-        $xmlData             = '';
-        $subscribers_counter = 0;
-        $totalCustomers      = sizeof($mailupCustomerIds);
-        foreach($mailupCustomerIds as $customerId) {
-            $subscribers_counter++;
-            $xmlCurrentCust = self::_getCustomerXml($customerId, $fields_mapping, $storeId);
-            if($xmlCurrentCust !== false)
+        $xmlData           = '';
+        $subscriberCounter = 0;
+        //$totalCustomers    = count($mailupCustomerIds);
+        foreach ($mailupCustomerIds as $customerId) {
+            $subscriberCounter++;
+            $xmlCurrentCust = self::_getCustomerXml($customerId, $fieldsMapping, $storeId);
+            if ($xmlCurrentCust !== false)
                 $xmlData .= $xmlCurrentCust;
         }
+
         /**
          * We have Valid Data to send
          */
-        if(strlen($xmlData) > 0) {
+        if (strlen($xmlData) > 0) {
             $importProcessData["xmlDoc"] = "<subscribers>$xmlData</subscribers>";
             $xmlData                     = "";
-            $subscribers_counter         = 0;
-            if($config->isLogEnabled($storeId)) {
+            $subscriberCounter           = 0;
+            if ($config->isLogEnabled($storeId)) {
                 Mage::log('ImportProcessData');
                 Mage::log($importProcessData, 0);
             }
@@ -437,20 +420,21 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             /**
              * Failure
              */
-            if($processID === false || $processID < 0) {
-                if($config->isLogEnabled($storeId)) {
+            if ($processID === false || $processID < 0) {
+                if ($config->isLogEnabled($storeId)) {
                     $config->dbLog(sprintf('newImportProcess [ERROR] [%d]', $processID), $jobId, $storeId);
                 }
 
                 return $processID;
-            } /**
-             * Success
-             */
-            else {
+            } else {
+                /**
+                 * Success
+                 */
                 $config->dbLog(sprintf("newImportProcess [SUCCESS] [ProcessID: %d]", $processID), $jobId, $storeId);
                 $jobModel->setProcessId($processID);
             }
         }
+
         /**
          * Build Data for StartImportProcesses
          */
@@ -469,10 +453,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             "idConfirmNL"     => $idConfirmNL
         );
 
-        if($config->isLogEnabled($storeId)) {
+        if ($config->isLogEnabled($storeId)) {
             $config->log("mailup: StartImportProcesses (STORE: {$storeId})", $storeId);
             $config->log($startImportProcessesData);
         }
+
         $startProcessesReturnCode = $wsImport->StartImportProcesses($startImportProcessesData);
         /**
          * Save the Job Model, and update the tries as we've just tried to Start the Process
@@ -480,11 +465,12 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $jobModel->incrementTries();
         try {
             $jobModel->save();
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             Mage::log($e->getMessage());
         }
-        if($config->isLogEnabled($storeId)) {
-            if($startProcessesReturnCode < 0) {
+
+        if ($config->isLogEnabled($storeId)) {
+            if ($startProcessesReturnCode < 0) {
                 $config->dbLog(sprintf("StartImportProcesses [ReturnCode] [ERROR] [%d]", $startProcessesReturnCode), $jobId, $storeId);
             } else {
                 $config->dbLog(sprintf("StartImportProcesses [ReturnCode] [SUCCESS] [%d]", $startProcessesReturnCode), $jobId, $storeId);
@@ -508,21 +494,20 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      * Get a single customers XML data.
      *
      * @param   int   $customerId
-     * @param   array $fields_mapping
+     * @param   array $fieldsMapping
      * @param   int   $storeId
      *
      * @return  string|false
      */
-    protected static function _getCustomerXml($customerId, $fields_mapping, $storeId)
+    protected static function _getCustomerXml($customerId, $fieldsMapping, $storeId)
     {
-        $config = Mage::getModel('mailup/config');
-        /* @var $config MailUp_MailUpSync_Model_Config */
+        $config     = Mage::getModel('mailup/config');
         $xmlData    = '';
         $mappedData = array();
         $subscriber = self::getCustomersData(array($customerId));
 
-        if(is_array($subscriber) && empty($subscriber)) {
-            if($config->isLogEnabled($storeId)) {
+        if (is_array($subscriber) && empty($subscriber)) {
+            if ($config->isLogEnabled($storeId)) {
                 $config->log('getCustomersData [EMPTY]');
             }
         }
@@ -540,8 +525,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
          */
         $xmlData .= '<subscriber email="'.$subscriber['email'].'" Prefix="" Number="" Name="">';
 
-        foreach($subscriber as $k => $v) {
-            if(!strlen($subscriber[$k])) {
+        foreach ($subscriber as $k => $v) {
+            if (!strlen($subscriber[$k])) {
                 $subscriber[$k] = ' '; // blank it out in mailup
             } else {
                 $subscriber[$k] = str_replace(array("\r\n", "\r", "\n"), " ", $v);
@@ -584,28 +569,30 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Add any custom customer attributes
         $customerAttributes = Mage::helper('mailup/customer')->getCustomCustomerAttrCollection();
-        foreach($customerAttributes as $attribute) {
+        foreach ($customerAttributes as $attribute) {
             $code            = $attribute->getAttributeCode().'_custom_customer_attributes';
             $mappings[$code] = $code;
         }
 
-        foreach($mappings as $mapTo => $mapFrom) {
-            if(isset($fields_mapping[$mapTo]) && !empty($fields_mapping[$mapTo])) {
-                $mappedData[$fields_mapping[$mapTo]] = '<campo'.$fields_mapping[$mapTo].'>'."<![CDATA[".$subscriber[$mapFrom]."]]>".'</campo'.$fields_mapping[$mapTo].'>';
+        foreach ($mappings as $mapTo => $mapFrom) {
+            if (isset($fieldsMapping[$mapTo]) && !empty($fieldsMapping[$mapTo])) {
+                $mappedData[$fieldsMapping[$mapTo]] = '<campo'.$fieldsMapping[$mapTo].'>'
+                    ."<![CDATA[".$subscriber[$mapFrom]."]]>".'</campo'.$fieldsMapping[$mapTo].'>';
             }
         }
 
         // No point in continuing if there is no mapped data
-        if(count($mappedData) == 0) {
-            if($config->isLogEnabled($storeId))
+        if (count($mappedData) == 0) {
+            if ($config->isLogEnabled($storeId))
                 $config->log('No mappings set, so cannot sync customers');
 
             return false;
         }
-        $last_field = max(array_keys($mappedData));
 
-        for($i = 1; $i < $last_field; $i++) {
-            if(!isset($mappedData[$i]) && !empty($i)) {
+        $lastField = max(array_keys($mappedData));
+
+        for ($i = 1; $i < $lastField; $i++) {
+            if (!isset($mappedData[$i]) && !empty($i)) {
                 /**
                  * If we leave a space it will blank the value out in mail up.
                  * if we leave it empty, it will leave the old value alone!
@@ -616,7 +603,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         ksort($mappedData);
         $custDataStr = implode("", $mappedData);
-        /**  All field values are handled as strings, character '|' (pipe) is not allowed and may lead to "-402" error codes **/
+        // All field values are handled as strings, character '|' (pipe)
+        // is not allowed and may lead to "-402" error codes
         //$mappedData = str_replace('|', '', $mappedData);
         $xmlData .= $custDataStr;
         $xmlData .= "</subscriber>\n";
@@ -636,25 +624,22 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function runJob($jobId)
     {
-        $config = Mage::getModel('mailup/config');
-        /* @var $config MailUp_MailUpSync_Model_Config */
-        require_once dirname(__FILE__).'/../Helper/Data.php';
-        $db_read       = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $db_write      = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $config        = Mage::getModel('mailup/config');
+        $dbRead        = Mage::getSingleton('core/resource')->getConnection('core_read');
+        $dbWrite       = Mage::getSingleton('core/resource')->getConnection('core_write');
         $syncTableName = Mage::getSingleton('core/resource')->getTableName('mailup/sync');
         $jobsTableName = Mage::getSingleton('core/resource')->getTableName('mailup/job');
         $lastsync      = gmdate("Y-m-d H:i:s");
         // reading customers (jobid == 0, their updates)
-        $customer_entity_table_name = Mage::getSingleton('core/resource')->getTableName('customer_entity');
-        $jobModel                   = Mage::getModel('mailup/job')->load($jobId);
-        /* @var $jobModel MailUp_MailUpSync_Model_Job */
+        $customerEntityTableName = Mage::getSingleton('core/resource')->getTableName('customer_entity');
+        $jobModel                = Mage::getModel('mailup/job')->load($jobId);
 
-        if(!$jobModel) {
+        if (!$jobModel) {
             throw new Mage_Exception('No Job Exists: '.$jobId);
         }
 
         $job     = $jobModel->getData();
-        $stmt    = $db_write->query(
+        $stmt    = $dbWrite->query(
             "UPDATE {$jobsTableName} 
             SET status='started', start_datetime='".gmdate("Y-m-d H:i:s")."' 
             WHERE id={$job["id"]}"
@@ -669,62 +654,66 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         // If group is 0 and there is a default group, set group to this group
         $defaultGroupId = Mage::getStoreConfig('mailup_newsletter/mailup/default_group');
-        if($job["mailupGroupId"] == 0 && $defaultGroupId !== null) {
+        if ($job["mailupGroupId"] == 0 && $defaultGroupId !== null) {
             $job["mailupGroupId"] = $defaultGroupId;
         }
 
         $tmp = Mage::getSingleton('mailup/source_lists');
         $tmp = $tmp->toOptionArray($storeId); // pass store id!
-        foreach($tmp as $t) {
-            if($t["value"] == $job['mailupIdList']) {
+        foreach ($tmp as $t) {
+            if ($t["value"] == $job['mailupIdList']) {
                 $job['mailupListGUID'] = $t["guid"];
                 $job["groups"]         = $t["groups"];
                 break;
             }
         }
+
         unset($tmp);
         unset($t);
-        $stmt = $db_read->query("
-            SELECT ms.*, ce.email 
+        $stmt = $dbRead->query(
+            "SELECT ms.*, ce.email 
             FROM {$syncTableName} ms 
-            JOIN $customer_entity_table_name ce 
+            JOIN $customerEntityTableName ce 
                 ON (ms.customer_id = ce.entity_id) 
             WHERE ms.needs_sync=1 
             AND ms.entity='customer' 
             AND job_id={$job["id"]}"
         );
-        while($row = $stmt->fetch()) {
+        while ($row = $stmt->fetch()) {
             $customers[] = $row["customer_id"];
         }
+
         /**
          * Send the Data!
          */
-        $returnCode = MailUp_MailUpSync_Helper_Data::generateAndSendCustomers($customers, $job, $storeId);
+        // remove old static method
+        $helper     = Mage::helper('mailup');
+        $returnCode = $helper::generateAndSendCustomers($customers, $job, $storeId);
         /**
          * Check return OK
          */
-        if($returnCode === 0) {
+        if ($returnCode === 0) {
             $customerCount = count($customers);
-            $db_write->query("
-                UPDATE {$syncTableName} SET needs_sync=0, last_sync='$lastsync' 
+            $dbWrite->query(
+                "UPDATE {$syncTableName} SET needs_sync=0, last_sync='$lastsync' 
                 WHERE job_id = {$job["id"]} 
                 AND entity='customer'"
             );
             $config->dbLog("Job Task [update] [Synced] [customer count:{$customerCount}]", $job["id"], $storeId);
             // finishing the job also
-            $db_write->query("
-                UPDATE {$jobsTableName} SET status='finished', finish_datetime='".gmdate("Y-m-d H:i:s")."' 
+            $dbWrite->query(
+                "UPDATE {$jobsTableName} SET status='finished', finish_datetime='".gmdate("Y-m-d H:i:s")."' 
                 WHERE id={$job["id"]}"
             );
             $config->dbLog("Jobs [Update] [Complete] [{$job["id"]}]", $job["id"], $storeId);
-        } /**
-         * Only successfull if we get 0 back. False is also a fail.
-         */
-        else {
-            $stmt = $db_write->query(
+        } else {
+            /**
+             * Only successfull if we get 0 back. False is also a fail.
+             */
+            $stmt = $dbWrite->query(
                 "UPDATE {$jobsTableName} SET status='queued' WHERE id={$job["id"]}"
             );
-            if($config->isLogEnabled()) {
+            if ($config->isLogEnabled()) {
                 $config->dbLog(sprintf("generateAndSendCustomers [ReturnCode] [ERROR] [%d]", $returnCode), $job["id"], $storeId);
             }
         }
@@ -743,21 +732,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $parent   = Mage::getModel('catalog/category')->load($categoryId);
         $children = $parent->getAllChildren(true);
 
-        if(!empty($children) && is_array($children)) {
+        if (!empty($children) && is_array($children)) {
             return $children;
         }
 
         return array();
-
-//        // Maybe fall back to this in older versions?
-//        $ids = array();
-//        $children = Mage::getModel('catalog/category')->getCategories($categoryId);
-//        foreach ($children as $category) {
-//            /* @var $category Mage_Catalog_Model_Category */
-//            $ids[] = $category->getId();
-//        }
-//        
-//        return $ids;
     }
 
     /**
@@ -781,7 +760,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     private static function _retriveDateFromDatetime($datetime)
     {
-        if(empty($datetime)) return "";
+        if (empty($datetime)) return "";
 
         return date("Y-m-d H:i:s", strtotime($datetime));
     }
@@ -795,7 +774,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     private static function _retriveDobFromDatetime($datetime)
     {
-        if(empty($datetime)) {
+        if (empty($datetime)) {
             return "";
         }
 
@@ -804,13 +783,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
     public static function _convertUTCToStoreTimezone($datetime)
     {
-        if(empty($datetime)) return "";
+        if (empty($datetime)) return "";
 
-        $TIMEZONE_STORE = new DateTimeZone(Mage::getStoreConfig("general/locale/timezone"));
-        $TIMEZONE_UTC   = new DateTimeZone("UTC");
+        $timezoneStore = new DateTimeZone(Mage::getStoreConfig("general/locale/timezone"));
+        $timezoneUtc   = new DateTimeZone("UTC");
 
-        $datetime = new DateTime($datetime, $TIMEZONE_UTC);
-        $datetime->setTimezone($TIMEZONE_STORE);
+        $datetime = new DateTime($datetime, $timezoneUtc);
+        $datetime->setTimezone($timezoneStore);
         $datetime = (string)$datetime->format("Y-m-d H:i:s");
 
         return $datetime;
@@ -818,46 +797,10 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
     public static function _convertUTCToStoreTimezoneAndFormatForMailup($datetime)
     {
-        if(empty($datetime)) return "";
+        if (empty($datetime)) return "";
         $datetime = self::_convertUTCToStoreTimezone($datetime);
 
         return date("d/m/Y", strtotime($datetime));
-    }
-
-    /**
-     * Clean the Resource Table
-     *
-     * @return  void
-     */
-    public function cleanResourceTable()
-    {
-        $sql        = "DELETE FROM `core_resource` WHERE `code` = 'mailup_setup';";
-        $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-        try {
-            $connection->query($sql);
-            die('deleted module in core_resource!');
-        } catch(Exception $e) {
-            Mage::log($e->getMessage());
-        }
-    }
-
-    /**
-     * Clean the Resource Table
-     *
-     * @return  void
-     */
-    public function showResourceTable()
-    {
-        $sql        = "SELECT * FROM `core_resource`";
-        $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
-        try {
-            $result = $connection->fetchAll($sql);
-            foreach($result as $row) {
-                echo $row['code']."<br />";
-            }
-        } catch(Exception $e) {
-            echo $e->getMessage();
-        }
     }
 
     /**
@@ -871,15 +814,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getAllProductAttributes()
     {
-        //$attributes = Mage::getModel('catalog/product')->getAttributes();
         $attributes = Mage::getSingleton('eav/config')
                           ->getEntityType(Mage_Catalog_Model_Product::ENTITY)->getAttributeCollection();
         // Localize attribute label (if you need it)
         $attributes->addStoreLabel(Mage::app()->getStore()->getId());
         $attributeArray = array();
-        foreach($attributes as $att) {
-            /* @var $att Mage_Catalog_Model_Resource_Eav_Attribute */
-            if($att->getIsVisible()) {
+        foreach ($attributes as $att) {
+            if ($att->getIsVisible()) {
                 $attributeArray[$att->getAttributeCode()] = array(
                     'value' => $att->getAttributeCode(),
                     'label' => $att->getStoreLabel() ? $att->getStoreLabel() : $att->getFrontendLabel()
@@ -901,15 +842,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getAllCustomerAttributes()
     {
-        //$attributes = Mage::getModel('catalog/product')->getAttributes();
         $attributes = Mage::getSingleton('eav/config')
                           ->getEntityType('customer')->getAttributeCollection();
         // Localize attribute label (if you need it)
         $attributes->addStoreLabel(Mage::app()->getStore()->getId());
         $attributeArray = array();
-        foreach($attributes as $att) {
-            /* @var $att Mage_Catalog_Model_Resource_Eav_Attribute */
-            if($att->getIsVisible()) {
+        foreach ($attributes as $att) {
+            if ($att->getIsVisible()) {
                 $attributeArray[$att->getAttributeCode()] = array(
                     'value' => $att->getAttributeCode(),
                     'label' => $att->getStoreLabel() ? $att->getStoreLabel() : $att->getFrontendLabel()
@@ -971,22 +910,23 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $storeId    = (int)$storeId;
 
         // If no status set given, just return true
-        if(empty($statuses))
+        if (empty($statuses))
             return true;
 
         $table      = Mage::getSingleton('core/resource')->getTableName('newsletter_subscriber');
         $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
         $sql        = "SELECT * FROM {$table} WHERE customer_id = '{$customerId}'";
         try {
-            $result = $connection->fetchAll($sql); // array
-            if(count($result) == 0) {
+            $result = $connection->fetchAll($sql);
+            if (count($result) == 0) {
                 return false;
             }
+
             $result = $result[0];
 
             // Return whether status is in given set
             return (array_search($result['subscriber_status'], $statuses) !== false);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             Mage::log($e->getMessage());
         }
 
@@ -1002,12 +942,14 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
     public function scheduleTask($when, $type = 'MailUp_MailUpSync')
     {
         $write = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $write->insert(Mage::getSingleton('core/resource')->getTableName('cron_schedule'), array(
-            "job_code"     => $type,
-            "status"       => "pending",
-            "created_at"   => gmdate("Y-m-d H:i:s"),
-            "scheduled_at" => $when
-        ));
+        $write->insert(
+            Mage::getSingleton('core/resource')->getTableName('cron_schedule'), array(
+                "job_code"     => $type,
+                "status"       => "pending",
+                "created_at"   => gmdate("Y-m-d H:i:s"),
+                "scheduled_at" => $when
+            )
+        );
     }
 
     /**
@@ -1020,16 +962,16 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getAttributeId($id, $entityTypeId = null)
     {
-        if($entityTypeId == null) {
+        if ($entityTypeId == null) {
             $entityTypeId = Mage::getModel('catalog/product')->getResource()->getEntityType()->getId();
         }
 
-        $installer = new Mage_Catalog_Model_Resource_Eav_Mysql4_Setup('core_setup');
-        if(!is_numeric($id)) {
-            $id = $installer->getAttribute($entityTypeId, $id, 'attribute_id');
+        $eav = Mage::getModel('eav/entity_setup');
+        if (!is_numeric($id)) {
+            $id = $eav->getAttribute($entityTypeId, $id, 'attribute_id');
         }
-        if(!is_numeric($id)) {
-            //throw Mage::exception('Mage_Eav', Mage::helper('eav')->__('Wrong attribute ID.'));
+
+        if (!is_numeric($id)) {
             return false;
         }
 
@@ -1047,7 +989,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $wsImport  = new Mailup_MailUpWsImport();
         $xmlString = $wsImport->GetNlList();
-        if(!$xmlString) return $this;
+        if (!$xmlString) return $this;
 
         $xmlString  = html_entity_decode($xmlString);
         $startLists = strpos($xmlString, '<Lists>');
@@ -1058,8 +1000,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $xml        = simplexml_load_string($xmlLists);
 
         $listGUID = false;
-        foreach($xml->List as $list) {
-            if($list['idList'] == $listId) {
+        foreach ($xml->List as $list) {
+            if ($list['idList'] == $listId) {
                 $listGUID = $list["listGUID"];
                 break;
             }
@@ -1099,14 +1041,15 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Make request
         try {
-            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
                 Mage::log("Cancelling abandonment: $ws");
             }
+
             $result = @file_get_contents($ws);
-            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
                 Mage::log("Cancelling abandonment result: $result");
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             Mage::logException($e);
         }
     }
@@ -1126,21 +1069,22 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $messages = array();
 
         // Run test for url console
-        if($this->_testConnectionConsole($urlConsole) === false) {
+        if ($this->_testConnectionConsole($urlConsole) === false) {
             $messages[] = array(
                 'message' => $this->__('Error in console URL'),
                 'type'    => 'error'
             );
         }
+
         // Run test for username and password
-        if($this->_testConnectionUserPassword($usernameWs, $passwordWs, $storeId) === false) {
+        if ($this->_testConnectionUserPassword($usernameWs, $passwordWs, $storeId) === false) {
             $messages[] = array(
                 'message' => $this->__('Error in username / password'),
                 'type'    => 'error'
             );
         }
 
-        if(empty($messages)) {
+        if (empty($messages)) {
             $messages[] = array(
                 'message' => $this->__('Success! Connection established with MailUp with given details'),
                 'type'    => 'success'
@@ -1161,11 +1105,13 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Mysql timeout
         $timeout = ini_get('mysql.connect_timeout');
-        if($timeout !== false && $timeout < 60) {
+        if ($timeout !== false && $timeout < 60) {
             $messages[] = array(
-                'message' => $this->__('Config warning: mysql.connect_timeout is %d which is a bit low. '.
+                'message' => $this->__(
+                    'Config warning: mysql.connect_timeout is %d which is a bit low. '.
                     'This may cause intermittent issues when connecting with MailUp. '.
-                    'Please contact your Web host to discuss an increase in the timeout setting.', $timeout),
+                    'Please contact your Web host to discuss an increase in the timeout setting.', $timeout
+                ),
                 'type'    => 'warning'
             );
         }
@@ -1182,7 +1128,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _testConnectionConsole($urlConsole)
     {
-        if(Mage::getStoreConfig('mailup_newsletter/mailup/skip_check') == false) {
+        if (Mage::getStoreConfig('mailup_newsletter/mailup/skip_check') == false) {
             // Set endpoint of API
             $ws = "http://{$urlConsole}/frontend/Xmlchksubscriber.aspx";
 
@@ -1194,14 +1140,15 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             // Make request
             $result = '';
             try {
-                if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+                if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
                     Mage::log("Testing Connection - console: $ws");
                 }
+
                 $result = @file_get_contents($ws);
-                if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+                if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
                     Mage::log("Testing Connection - console: $result");
                 }
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 Mage::logException($e);
             }
 

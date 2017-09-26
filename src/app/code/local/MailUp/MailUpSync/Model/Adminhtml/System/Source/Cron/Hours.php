@@ -13,6 +13,7 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Source_Cron_Hours
         for ($i = 1; $i <= 24; $i++) {
             $hours[] = array('label' => $i, 'value' => $i);
         }
+
         return $hours;
     }
 }

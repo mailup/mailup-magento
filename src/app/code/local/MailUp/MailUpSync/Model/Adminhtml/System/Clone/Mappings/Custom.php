@@ -22,7 +22,7 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Clone_Mappings_Custom
         foreach ($customerAttributes as $attribute) {
             /* @var $attribute Mage_Eav_Model_Entity_Attribute */
             $prefixes[] = array(
-                'field' => $attribute->getAttributeCode() . '_',
+                'field' => $attribute->getAttributeCode().'_',
                 'label' => $attribute->getFrontend()->getLabel(),
             );
         }

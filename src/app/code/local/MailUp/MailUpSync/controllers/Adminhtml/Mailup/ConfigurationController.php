@@ -81,6 +81,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_ConfigurationController extends Mage_Ad
                 $renderedMessages[] = '<li class="'.$msg['type'].'-msg"><ul><li>'.$msg['message'].'</li></ul></li>';
             }
         }
+
         $output = '<ul class="messages">'.implode("\n", $renderedMessages).'</ul>';
         $this->getResponse()->setBody($output);
     }

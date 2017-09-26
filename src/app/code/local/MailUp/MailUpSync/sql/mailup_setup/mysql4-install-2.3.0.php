@@ -5,13 +5,16 @@
 $installer = $this;
 $this->startSetup();
 
-$installer->run("CREATE TABLE IF NOT EXISTS `mailup_filter_hints` (
+$installer->run(
+    "CREATE TABLE IF NOT EXISTS `mailup_filter_hints` (
   `filter_name` varchar(255) collate utf8_unicode_ci NOT NULL,
   `hints` varchar(255) collate utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`filter_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;");
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
+);
 
-$installer->run("DROP TABLE IF EXISTS {$installer->getTable('mailup/sync')};
+$installer->run(
+    "DROP TABLE IF EXISTS {$installer->getTable('mailup/sync')};
     CREATE TABLE IF NOT EXISTS {$installer->getTable('mailup/sync')} (
   `store_id` int(11) DEFAULT NULL,
   `customer_id` int(11) NOT NULL,
@@ -21,9 +24,11 @@ $installer->run("DROP TABLE IF EXISTS {$installer->getTable('mailup/sync')};
   `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `last_sync` datetime NULL,
   PRIMARY KEY (`customer_id`, `entity`, `job_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;");
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
+);
 
-$installer->run("
+$installer->run(
+    "
     DROP TABLE IF EXISTS {$installer->getTable('mailup/job')};
     CREATE TABLE IF NOT EXISTS {$installer->getTable('mailup/job')} (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -35,6 +40,7 @@ $installer->run("
   `start_datetime` datetime,
   `finish_datetime` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;");
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;"
+);
 
 $this->endSetup();

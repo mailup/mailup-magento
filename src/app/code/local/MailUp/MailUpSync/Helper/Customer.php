@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Customer helper methods for MailUp
  */
@@ -8,6 +9,7 @@ class MailUp_MailUpSync_Helper_Customer extends Mage_Core_Helper_Abstract
      * Check whether customer attribute is on ignore list
      *
      * @param $attr string $attr Name of attribute
+     *
      * @return bool
      */
     public function isAttrIgnored($attr)
@@ -26,27 +28,27 @@ class MailUp_MailUpSync_Helper_Customer extends Mage_Core_Helper_Abstract
     protected static function _getAttrsIgnored()
     {
         static $attrs = array(
-            'confirmation' => true,
-            'created_at' => true,
-            'created_in' => true,
-            'default_billing' => true,
-            'default_shipping' => true,
+            'confirmation'              => true,
+            'created_at'                => true,
+            'created_in'                => true,
+            'default_billing'           => true,
+            'default_shipping'          => true,
             'disable_auto_group_change' => true,
-            'dob' => true,
-            'email' => true,
-            'firstname' => true,
-            'gender' => true,
-            'group_id' => true,
-            'lastname' => true,
-            'middlename' => true,
-            'password_hash' => true,
-            'prefix' => true,
-            'rp_token' => true,
-            'rp_token_created_at' => true,
-            'store_id' => true,
-            'suffix' => true,
-            'taxvat' => true,
-            'website_id' => true
+            'dob'                       => true,
+            'email'                     => true,
+            'firstname'                 => true,
+            'gender'                    => true,
+            'group_id'                  => true,
+            'lastname'                  => true,
+            'middlename'                => true,
+            'password_hash'             => true,
+            'prefix'                    => true,
+            'rp_token'                  => true,
+            'rp_token_created_at'       => true,
+            'store_id'                  => true,
+            'suffix'                    => true,
+            'taxvat'                    => true,
+            'website_id'                => true
         );
 
         return $attrs;
@@ -62,7 +64,7 @@ class MailUp_MailUpSync_Helper_Customer extends Mage_Core_Helper_Abstract
         $attrs = self::_getAttrsIgnored();
 
         $customerAttributes = Mage::getResourceModel('customer/attribute_collection')
-            ->addFieldToFilter('attribute_code', array('nin' => array_keys($attrs)));
+                                  ->addFieldToFilter('attribute_code', array('nin' => array_keys($attrs)));
 
         return $customerAttributes;
     }

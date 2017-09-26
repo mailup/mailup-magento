@@ -7,11 +7,11 @@ $this->startSetup();
 
 /**
  * Install Job Sync Tasks
- * 
+ *
  * Change to InnoDB, and add in Foreign Key
  */
-$installer->run("
-  DROP TABLE IF EXISTS {$installer->getTable('mailup/sync')};
+$installer->run(
+    "DROP TABLE IF EXISTS {$installer->getTable('mailup/sync')};
   CREATE TABLE IF NOT EXISTS {$installer->getTable('mailup/sync')} (
   `id` int (11) NOT NULL AUTO_INCREMENT,
   `store_id` int(11) DEFAULT NULL,
@@ -29,6 +29,7 @@ $installer->run("
     REFERENCES {$installer->getTable('mailup/job')} (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;");
-   
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
+);
+
 $this->endSetup();

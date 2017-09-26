@@ -43,9 +43,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         }
 
         $config = Mage::getModel('mailup/config');
-        /* @var $config MailUp_MailUpSync_Model_Config */
         //$subscriber = Mage::getModel('newsletter/subscriber');
-        /* @var $subscriber Mage_Newsletter_Model_Subscriber */
 
         $sendOptinEmail = isset($post['send_optin_email_to_new_subscribers']) && ($post['send_optin_email_to_new_subscribers'] == 1);
         // Only save message_id if passed and if opt_in is true
@@ -97,7 +95,6 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                     }
 
                     $job = Mage::getModel('mailup/job');
-                    /* @var $job MailUp_MailUpSync_Model_Job */
                     $job->setData(
                         array(
                             "mailupgroupid"  => $post['mailupGroupId'],
@@ -136,9 +133,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                     foreach ($customerIdArray as $customerId) {
                         $customerCount++;
                         //$customer = Mage::getModel('customer/customer');
-                        /* @var $customer Mage_Customer_Model_Customer */
                         $jobTask = Mage::getModel('mailup/sync');
-                        /* @var $jobTask MailUp_MailUpSync_Model_Sync */
                         try {
                             $jobTask->setData(
                                 array(
@@ -211,14 +206,14 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
      */
     protected function _getBatches($mailupCustomerIds, $storeId)
     {
-        $helper = Mage::helper('mailup');
-        /* @var $helper MailUp_MailUpSync_Helper_Data */
+        $helper         = Mage::helper('mailup');
         $totalCustomers = count($mailupCustomerIds);
         $batches        = array_chunk($mailupCustomerIds, self::BATCH_SIZE);
         //$totalBatches = count($customerIdBatches);
         if ($totalCustomers > self::BATCH_SIZE) {
             $this->_config()->dbLog("Batching Customers [{$totalCustomers}] CHUNKS [".self::BATCH_SIZE."]", 0, $storeId);
         }
+
         $batchArray    = array();
         $customerCount = 0;
         foreach ($batches as $batch) {
@@ -232,6 +227,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                     $notSubscribed[] = $customerId;
                 }
             }
+
             /**
              * @todo    only return segmented if both not empty.
              */
@@ -289,6 +285,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                 $file .= ',"Last abandoned cart date","Last abandoned cart total","Last abandoned cart id"';
                 $file .= ',"Total orders amount","Last 12 months amount","Last 30 days amount","All products ids"';
             }
+
             $file .= ';';
 
             foreach ($mailupCustomerIds as $customerId) {
@@ -389,9 +386,9 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
      */
     public function checkRunningImport()
     {
-        $syncTableName       = Mage::getSingleton('core/resource')->getTableName('mailup/sync');
-        $db                  = Mage::getSingleton("core/resource")->getConnection("core_read");
-        $cron_schedule_table = Mage::getSingleton("core/resource")->getTableName("cron_schedule");
+        $syncTableName     = Mage::getSingleton('core/resource')->getTableName('mailup/sync');
+        $db                = Mage::getSingleton("core/resource")->getConnection("core_read");
+        $cronScheduleTable = Mage::getSingleton("core/resource")->getTableName("cron_schedule");
 
         /**
          * @todo    check if a cron has been run in the past X minites
@@ -411,55 +408,30 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             }
         }
 
-        $running_processes = $db->fetchOne(
+        $runningProcesses = $db->fetchOne(
             "SELECT count(*) 
-            FROM $cron_schedule_table 
+            FROM $cronScheduleTable 
             WHERE job_code='mailup_mailupsync' AND status='running'"
         );
-        if ($running_processes) {
-            Mage::getSingleton("adminhtml/session")->addNotice($this->__("A MailUp import process is running."));
+        if ($runningProcesses) {
+            Mage::getSingleton("adminhtml/session")
+                ->addNotice($this->__("A MailUp import process is running."));
 
             return;
         }
 
-        $scheduled_processes = $db->fetchOne(
+        $scheduledProcesses = $db->fetchOne(
             "SELECT count(*) 
-            FROM $cron_schedule_table 
+            FROM $cronScheduleTable 
             WHERE job_code='mailup_mailupsync' AND status='pending'"
         );
-        if ($scheduled_processes) {
-            Mage::getSingleton("adminhtml/session")->addNotice($this->__("A MailUp import process is schedules and will be executed soon."));
+        if ($scheduledProcesses) {
+            Mage::getSingleton("adminhtml/session")
+                ->addNotice($this->__("A MailUp import process is schedules and will be executed soon."));
 
             return;
         }
     }
-
-    // GM review marketplace
-    // Used in filter.phtml for local test
-    // TODO: remove
-    //public function testCronAction()
-    //{
-    //    $cron = new MailUp_MailUpSync_Model_Cron();
-    //    $cron->run();
-    //}
-
-    // GM review marketplace
-    // Used in filter.phtml for local test
-    // TODO: remove
-
-    //public function testFieldsAction()
-    //{
-    //    $wsSend    = new Mailup_MailUpWsSend();
-    //    $accessKey = $wsSend->loginFromId();
-    //
-    //    if($accessKey !== false) {
-    //        $fields = $wsSend->GetFields($accessKey);
-    //        print_r($fields);
-    //        die('success');
-    //    } else {
-    //        die('no access key returned');
-    //    }
-    //}
 
     protected function _isAllowed()
     {
