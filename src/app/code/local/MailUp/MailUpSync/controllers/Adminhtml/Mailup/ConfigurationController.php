@@ -1,16 +1,18 @@
 <?php
 
-
 class MailUp_MailUpSync_Adminhtml_Mailup_ConfigurationController extends Mage_Adminhtml_Controller_Action
 {
-	public function indexAction()
-	{
-		$url = Mage::getModel('adminhtml/url');
-		$url = $url->getUrl("adminhtml/system_config/edit", array(
-			"section" => "mailup_newsletter"
-		));
-		Mage::app()->getResponse()->setRedirect($url);
-	}
+    public function indexAction()
+    {
+        $url = Mage::getModel('adminhtml/url');
+        $url = $url->getUrl(
+            "adminhtml/system_config/edit",
+            array(
+                "section" => "mailup_newsletter"
+            )
+        );
+        Mage::app()->getResponse()->setRedirect($url);
+    }
 
     /**
      * Get groups for given list
@@ -46,10 +48,11 @@ class MailUp_MailUpSync_Adminhtml_Mailup_ConfigurationController extends Mage_Ad
 
         // Ensure that all required fields are given
         if ($urlConsole === null || $usernameWs === null || $passwordWs === null) {
-            $class = 'notice';
+            $class   = 'notice';
             $message = $this->__('Please fill in MailUp console URL, Username and Password before testing');
-            $output = '<ul class="messages"><li class="' . $class . '-msg"><ul><li>' . $message . '</li></ul></li></ul>';
+            $output  = '<ul class="messages"><li class="'.$class.'-msg"><ul><li>'.$message.'</li></ul></li></ul>';
             $this->getResponse()->setBody($output);
+
             return;
         }
 
@@ -60,30 +63,30 @@ class MailUp_MailUpSync_Adminhtml_Mailup_ConfigurationController extends Mage_Ad
         $res->getConnection('core_write')->closeConnection();
 
         // Test connection
-        $storeId = Mage::app()->getStore();
-        $retConn = Mage::helper('mailup')->testConnection($urlConsole, $usernameWs, $passwordWs, $storeId);
+        $storeId  = Mage::app()->getStore();
+        $retConn  = Mage::helper('mailup')->testConnection($urlConsole, $usernameWs, $passwordWs, $storeId);
         $messages = array_merge($messages, $retConn);
 
         // Config tests
         $retConfig = Mage::helper('mailup')->testConfig();
-        $messages = array_merge($messages, $retConfig);
+        $messages  = array_merge($messages, $retConfig);
 
         // Re-open connection to avoid mysql gone away errors
         $res->getConnection('core_write')->getConnection();
 
         // Connect up the messages to be returned as ajax
         $renderedMessages = array();
-        if (count($messages) > 0) {
+        if (empty($messages)) {
             foreach ($messages as $msg) {
-                $renderedMessages[] = '<li class="' . $msg['type'] . '-msg"><ul><li>' . $msg['message'] . '</li></ul></li>';
+                $renderedMessages[] = '<li class="'.$msg['type'].'-msg"><ul><li>'.$msg['message'].'</li></ul></li>';
             }
         }
-        $output = '<ul class="messages">' . implode("\n", $renderedMessages) . '</ul>';
+        $output = '<ul class="messages">'.implode("\n", $renderedMessages).'</ul>';
         $this->getResponse()->setBody($output);
     }
 
     protected function _isAllowed()
-	{
-		return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_configuration');
-	}
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('newsletter/mailup/mailup_configuration');
+    }
 }

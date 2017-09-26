@@ -38,7 +38,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $post    = $this->getRequest()->getPost();
         $storeId = isset($post['store_id']) ? (int)$post['store_id'] : null;
 
-        if(empty($post)) {
+        if (empty($post)) {
             Mage::throwException($this->__('Invalid form data.'));
         }
 
@@ -59,7 +59,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
          * Create a New Group on Mailup
          */
         $post["mailupNewGroupName"] = trim($post["mailupNewGroupName"]);
-        if($post["mailupNewGroup"] && strlen($post["mailupNewGroupName"])) {
+        if ($post["mailupNewGroup"] && strlen($post["mailupNewGroupName"])) {
 
             $wsImport              = new Mailup_MailUpWsImport($storeId);
             $post['mailupGroupId'] = $wsImport->CreaGruppo(
@@ -75,14 +75,14 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
          * Makes batches if required. Separate the jobs into max amount of customers.
          * Create a new job for each batch.
          */
-        foreach($batches as $batchNumber => $batch) {
+        foreach ($batches as $batchNumber => $batch) {
             try {
                 $customerCount = 0;
                 /**
                  * We have split into subscribers and non-subscribers
                  */
-                foreach($batch as $subscribeStatus => $customerIdArray) {
-                    if(empty($customerIdArray)) {
+                foreach ($batch as $subscribeStatus => $customerIdArray) {
+                    if (empty($customerIdArray)) {
                         continue;
                     }
 
@@ -91,7 +91,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                     $sendOptin = 0;
                     /* If customer is not subscribed and confirmation email is requested,
                        then set as pending with a confirmation email */
-                    if($subscribeStatus != self::STATUS_SUBSCRIBED && $sendOptinEmail) {
+                    if ($subscribeStatus != self::STATUS_SUBSCRIBED && $sendOptinEmail) {
                         $asPending = 1;
                         $sendOptin = 1;
                     }
@@ -110,7 +110,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                             'list_guid'      => $post['mailupListGUID'],
                         )
                     );
-                    if($sendMessageId) {
+                    if ($sendMessageId) {
                         $job->setMessageId($sendMessageId);
                     }
                     try {
@@ -125,7 +125,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                             $job->getId(),
                             $storeId
                         );
-                    } catch(Exception $e) {
+                    } catch (Exception $e) {
                         $config->dbLog("Job [Insert] [FAILED] [Group:{$post['mailupGroupId']}] ", 0, $storeId);
                         $config->log($e);
                         throw $e;
@@ -133,7 +133,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                     /**
                      * Each Customer
                      */
-                    foreach($customerIdArray as $customerId) {
+                    foreach ($customerIdArray as $customerId) {
                         $customerCount++;
                         //$customer = Mage::getModel('customer/customer');
                         /* @var $customer Mage_Customer_Model_Customer */
@@ -151,7 +151,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                                 )
                             );
                             $jobTask->save();
-                        } catch(Exception $e) {
+                        } catch (Exception $e) {
                             $config->dbLog("Job Task [Sync] [FAILED] [customer:{$customerId}] [Update]", $job->getId(), $storeId);
                             $config->log($e);
                         }
@@ -181,7 +181,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                 //$config->dbLog("Secheduled Task: " . gmdate("Y-m-d H:i:s"), $job_id, $storeId);
                 $message = $this->__('Members have been sent correctly');
                 Mage::getSingleton('adminhtml/session')->addSuccess($message);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                 $errorMessage = $this->__('Warning: no member has been selected');
                 Mage::getSingleton('adminhtml/session')->addError($errorMessage);
@@ -216,17 +216,17 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $totalCustomers = count($mailupCustomerIds);
         $batches        = array_chunk($mailupCustomerIds, self::BATCH_SIZE);
         //$totalBatches = count($customerIdBatches);
-        if($totalCustomers > self::BATCH_SIZE) {
+        if ($totalCustomers > self::BATCH_SIZE) {
             $this->_config()->dbLog("Batching Customers [{$totalCustomers}] CHUNKS [".self::BATCH_SIZE."]", 0, $storeId);
         }
         $batchArray    = array();
         $customerCount = 0;
-        foreach($batches as $batch) {
+        foreach ($batches as $batch) {
             $subscribed    = array();
             $notSubscribed = array();
-            foreach($batch as $customerId) {
+            foreach ($batch as $customerId) {
                 $customerCount++;
-                if($helper->isSubscriber($customerId, $storeId)) {
+                if ($helper->isSubscriber($customerId, $storeId)) {
                     $subscribed[] = $customerId;
                 } else {
                     $notSubscribed[] = $customerId;
@@ -256,7 +256,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
      */
     protected function _config()
     {
-        if(null === $this->_config) {
+        if (null === $this->_config) {
             $this->_config = Mage::getModel('mailup/config');
         }
 
@@ -273,7 +273,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $post = $this->getRequest()->getPost();
         $file = '';
 
-        if($post['countPost'] > 0) {
+        if ($post['countPost'] > 0) {
             //preparo l'elenco degli iscritti da salvare nel csv
             $mailupCustomerIds = Mage::getSingleton('core/session')->getMailupCustomerIds();
 
@@ -282,7 +282,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
 
             //CSV Column names
             $file = '"Email","First Name","Last Name"';
-            if(Mage::getStoreConfig('mailup_newsletter/mailup/enable_mailup_synchro') == 1) {
+            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_mailup_synchro') == 1) {
                 $file .= ',"Company","City","Province","Zip code","Region","Country code","Address","Fax","Phone","Customer id"';
                 $file .= ',"Last Order id","Last Order date","Last Order total","Last order product ids","Last order category ids"';
                 $file .= ',"Last sent order date","Last sent order id"';
@@ -291,9 +291,9 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             }
             $file .= ';';
 
-            foreach($mailupCustomerIds as $customerId) {
-                foreach($customersData as $subscriber) {
-                    if($subscriber['email'] == $customerId['email']) {
+            foreach ($mailupCustomerIds as $customerId) {
+                foreach ($customersData as $subscriber) {
+                    if ($subscriber['email'] == $customerId['email']) {
                         $file .= "\n";
                         $file .= '"'.$subscriber['email'].'"';
                         $file .= ',"'.((!empty($subscriber['nome'])) ? $subscriber['nome'] : '').'"';
@@ -355,7 +355,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
 
             $wsImport = new Mailup_MailUpWsImport();
             $wsImport->saveFilterHint($filter_name, $post);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $errorMessage = $this->__('Error: unable to save current filter');
             Mage::getSingleton('adminhtml/session')->addError($errorMessage);
         }
@@ -374,7 +374,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
 
             $wsImport = new Mailup_MailUpWsImport();
             $wsImport->deleteFilterHint($post['filter_name']);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $errorMessage = $this->__('Error: unable to delete the filter');
             Mage::getSingleton('adminhtml/session')->addError($errorMessage);
         }
@@ -398,10 +398,10 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
          *          notify if cron is npt up and running
          */
         $lastTime = $db->fetchOne("SELECT max(last_sync) FROM {$syncTableName}"); // 2013-04-18 19:23:55
-        if(!empty($lastTime)) {
+        if (!empty($lastTime)) {
             $dateTime       = \DateTime::createFromFormat('Y-m-d H:i:s', $lastTime);
             $lastTimeObject = clone $dateTime;
-            if($dateTime) {
+            if ($dateTime) {
                 $dateTime->modify('+30 minutes');
                 $now = new DateTime();
                 //if($dateTime < $now) {
@@ -416,7 +416,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             FROM $cron_schedule_table 
             WHERE job_code='mailup_mailupsync' AND status='running'"
         );
-        if($running_processes) {
+        if ($running_processes) {
             Mage::getSingleton("adminhtml/session")->addNotice($this->__("A MailUp import process is running."));
 
             return;
@@ -427,7 +427,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             FROM $cron_schedule_table 
             WHERE job_code='mailup_mailupsync' AND status='pending'"
         );
-        if($scheduled_processes) {
+        if ($scheduled_processes) {
             Mage::getSingleton("adminhtml/session")->addNotice($this->__("A MailUp import process is schedules and will be executed soon."));
 
             return;

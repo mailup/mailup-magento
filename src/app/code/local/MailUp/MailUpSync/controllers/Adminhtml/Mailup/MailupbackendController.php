@@ -1,16 +1,17 @@
 <?php
+
 class MailUp_MailUpSync_Adminhtml_Mailup_MailupbackendController extends Mage_Adminhtml_Controller_Action
 {
     /**
      * Default Action
      */
-	public function indexAction()
+    public function indexAction()
     {
-       $this->loadLayout();
-	   $this->_title($this->__("MailUp Jobs"));
-	   $this->renderLayout();
+        $this->loadLayout();
+        $this->_title($this->__("MailUp Jobs"));
+        $this->renderLayout();
     }
-    
+
     /**
      * Run The Job
      */
@@ -18,26 +19,26 @@ class MailUp_MailUpSync_Adminhtml_Mailup_MailupbackendController extends Mage_Ad
     {
         /** @var $session Mage_Admin_Model_Session */
         $session = Mage::getSingleton('adminhtml/session');
-        $id = $this->getRequest()->getParam('id');
-        
-        if( ! $id) {
+        $id      = $this->getRequest()->getParam('id');
+
+        if (!$id) {
             $session->addError(
                 Mage::helper('mailup')->__('Invalid Entity')
             );
         }
-        
+
         $entity = Mage::getModel('mailup/job')->load($id);
-        if($entity) {   
+        if ($entity) {
             Mage::helper('mailup')->runJob($entity->getId());
         }
- 
+
         $session->addSuccess(
             Mage::helper('mailup')->__("Run Job [{$entity->getId()}]")
         );
 
         $this->_redirect('*/*/index');
     }
-    
+
     /**
      * Delete a job
      */
@@ -45,17 +46,17 @@ class MailUp_MailUpSync_Adminhtml_Mailup_MailupbackendController extends Mage_Ad
     {
         /** @var $session Mage_Admin_Model_Session */
         $session = Mage::getSingleton('adminhtml/session');
-        $id = $this->getRequest()->getParam('id');
-        
-        if( ! $id) {
+        $id      = $this->getRequest()->getParam('id');
+
+        if (!$id) {
             $session->addError(
                 Mage::helper('mailup')->__('Invalid Entity')
             );
         }
-        
+
         $entity = Mage::getModel('mailup/job')->load($id);
         $entity->delete();
- 
+
         $session->addSuccess(
             Mage::helper('mailup')->__("Job [{$entity->getId()}] [Deleted]")
         );
