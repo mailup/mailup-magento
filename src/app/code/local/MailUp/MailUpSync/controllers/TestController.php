@@ -1,8 +1,6 @@
 <?php
-/**
- * TestController.php
- */
-// TODO: to remove if not used
+// GM review marketplace
+// TODO: remove if not used
 
 //class MailUp_MailUpSync_TestController extends Mage_Core_Controller_Front_Action
 //{

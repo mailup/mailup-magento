@@ -131,8 +131,12 @@ class MailUp_MailUpSync_Model_Observer
 	{
 		$model = $observer->getEvent()->getModel();
 		if (empty($model)) $model = $model = $observer->getEvent()->getDataObject();
-		if (isset($GLOBALS["__sl_mailup_leggi_utente"])) return $this;
-		$GLOBALS["__sl_mailup_leggi_utente"] = true;
+
+        // GM review marketplace
+        // Seems not used in other files
+        // TODO: remove if not used
+		//if (isset($GLOBALS["__sl_mailup_leggi_utente"])) return $this;
+		//$GLOBALS["__sl_mailup_leggi_utente"] = true;
 
 		try {
 			$WSDLUrl = 'http://services.mailupnet.it/MailupReport.asmx?WSDL';

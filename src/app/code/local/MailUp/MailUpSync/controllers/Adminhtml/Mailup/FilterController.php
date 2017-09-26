@@ -434,25 +434,32 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         }
     }
 
-    public function testCronAction()
-    {
-        $cron = new MailUp_MailUpSync_Model_Cron();
-        $cron->run();
-    }
+    // GM review marketplace
+    // Used in filter.phtml for local test
+    // TODO: remove
+    //public function testCronAction()
+    //{
+    //    $cron = new MailUp_MailUpSync_Model_Cron();
+    //    $cron->run();
+    //}
 
-    public function testFieldsAction()
-    {
-        $wsSend    = new Mailup_MailUpWsSend();
-        $accessKey = $wsSend->loginFromId();
+    // GM review marketplace
+    // Used in filter.phtml for local test
+    // TODO: remove
 
-        if($accessKey !== false) {
-            $fields = $wsSend->GetFields($accessKey);
-            print_r($fields);
-            die('success');
-        } else {
-            die('no access key returned');
-        }
-    }
+    //public function testFieldsAction()
+    //{
+    //    $wsSend    = new Mailup_MailUpWsSend();
+    //    $accessKey = $wsSend->loginFromId();
+    //
+    //    if($accessKey !== false) {
+    //        $fields = $wsSend->GetFields($accessKey);
+    //        print_r($fields);
+    //        die('success');
+    //    } else {
+    //        die('no access key returned');
+    //    }
+    //}
 
     protected function _isAllowed()
     {
