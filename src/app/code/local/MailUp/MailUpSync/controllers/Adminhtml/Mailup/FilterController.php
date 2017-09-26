@@ -273,8 +273,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             //preparo l'elenco degli iscritti da salvare nel csv
             $mailupCustomerIds = Mage::getSingleton('core/session')->getMailupCustomerIds();
 
-            //require_once(dirname(__FILE__) . '/../Helper/Data.php');
-            $customersData = MailUp_MailUpSync_Helper_Data::getCustomersData();
+            $customersData = Mage::helper('mailup')->getCustomersData();
 
             //CSV Column names
             $file = '"Email","First Name","Last Name"';

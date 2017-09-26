@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Data.php
+ * MailUp
  *
- * @todo    get rid of these static methods!
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 {
@@ -37,7 +38,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return  array
      */
-    public static function getCustomersData($customerCollection = null)
+    public function getCustomersData($customerCollection = null)
     {
         $config = Mage::getModel('mailup/config');
 
@@ -127,7 +128,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                     $last12monthsOrdersAmount += $currentOrderTotal;
                 }
 
-                $currentOrderTotal                   = self::_formatPrice($currentOrderTotal);
+                $currentOrderTotal                   = $this->_formatPrice($currentOrderTotal);
                 $currentOrderId                      = $order->getIncrementId();
                 $allOrdersTotals[$currentOrderId]    = $currentOrderTotal;
                 $allOrdersDateTimes[$currentOrderId] = $currentOrderCreationDate;
@@ -135,7 +136,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
                 if ($order->hasShipments() and ($order->getId() > $lastShipmentOrderId)) {
                     $lastShipmentOrderId   = $order->getId();
-                    $lastShipmentOrderDate = self::_retriveDateFromDatetime($order->getCreatedAt());
+                    $lastShipmentOrderDate = $this->_retriveDateFromDatetime($order->getCreatedAt());
                 }
 
                 $items = $order->getAllItems();
@@ -144,8 +145,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
 
-            $toSend[$i]['TotaleFatturatoUltimi30gg']   = self::_formatPrice($last30daysOrdersAmount);
-            $toSend[$i]['TotaleFatturatoUltimi12Mesi'] = self::_formatPrice($last12monthsOrdersAmount);
+            $toSend[$i]['TotaleFatturatoUltimi30gg']   = $this->_formatPrice($last30daysOrdersAmount);
+            $toSend[$i]['TotaleFatturatoUltimi12Mesi'] = $this->_formatPrice($last12monthsOrdersAmount);
             $toSend[$i]['IDTuttiProdottiAcquistati']   = implode(',', $allProductsIds);
 
             ksort($allOrdersDateTimes);
@@ -175,9 +176,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                     }
 
                     $datetimeCart = $lastCart->getUpdatedAt();
-                    //$toSend[$i]['TotaleCarrelloAbbandonato'] = self::_formatPrice($lastCart->getGrandTotal());
-                    $toSend[$i]['TotaleCarrelloAbbandonato'] = self::_formatPrice($lastCart->getSubtotal());
-                    $toSend[$i]['DataCarrelloAbbandonato']   = self::_retriveDateFromDatetime($datetimeCart);
+                    $toSend[$i]['TotaleCarrelloAbbandonato'] = $this->_formatPrice($lastCart->getSubtotal());
+                    $toSend[$i]['DataCarrelloAbbandonato']   = $this->_retriveDateFromDatetime($datetimeCart);
                     $toSend[$i]['IDCarrelloAbbandonato']     = $lastCart->getId();
                 } else {
                     if ($config->isLogEnabled()) {
@@ -231,7 +231,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                 }
 
-                $toSend[$i]['registeredDate'] = self::_retriveDateFromDatetime($customer->getCreatedAt());
+                $toSend[$i]['registeredDate'] = $this->_retriveDateFromDatetime($customer->getCreatedAt());
 
                 //controllo se iscritto o meno alla newsletter
                 if (Mage::getModel('newsletter/subscriber')->loadByCustomer($customer)->isSubscribed()) {
@@ -268,11 +268,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                     $toSend[$i]['telefono']  = '';
                 }
 
-                $toSend[$i]['DataUltimoOrdine']   = self::_retriveDateFromDatetime($lastOrderDateTime);
+                $toSend[$i]['DataUltimoOrdine']   = $this->_retriveDateFromDatetime($lastOrderDateTime);
                 $toSend[$i]['TotaleUltimoOrdine'] = end($allOrdersTotals);
                 $toSend[$i]['IDUltimoOrdine']     = end($allOrdersIds);
 
-                $toSend[$i]['TotaleFatturato'] = self::_formatPrice($allOrdersTotalAmount);
+                $toSend[$i]['TotaleFatturato'] = $this->_formatPrice($allOrdersTotalAmount);
 
                 //ottengo gli id di prodotti e categorie (dell'ultimo ordine)
                 $lastOrder   = Mage::getModel('sales/order')->loadByIncrementId(end($allOrdersIds));
@@ -299,7 +299,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
 
-            $toSend[$i]['DateOfBirth'] = self::_retriveDobFromDatetime($customer->getDob());
+            $toSend[$i]['DateOfBirth'] = $this->_retriveDobFromDatetime($customer->getDob());
             $toSend[$i]['Gender']      = $customer->getAttribute('gender')->getSource()
                                                   ->getOptionText($customer->getGender());
 
@@ -323,7 +323,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return  int|FALSE ReturnCode
      */
-    public static function generateAndSendCustomers($mailupCustomerIds, $post = null, $storeId = null)
+    public function generateAndSendCustomers($mailupCustomerIds, $post = null, $storeId = null)
     {
         $config = Mage::getModel('mailup/config');
 
@@ -400,7 +400,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         //$totalCustomers    = count($mailupCustomerIds);
         foreach ($mailupCustomerIds as $customerId) {
             $subscriberCounter++;
-            $xmlCurrentCust = self::_getCustomerXml($customerId, $fieldsMapping, $storeId);
+            $xmlCurrentCust = $this->_getCustomerXml($customerId, $fieldsMapping, $storeId);
             if ($xmlCurrentCust !== false)
                 $xmlData .= $xmlCurrentCust;
         }
@@ -499,12 +499,12 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return  string|false
      */
-    protected static function _getCustomerXml($customerId, $fieldsMapping, $storeId)
+    protected function _getCustomerXml($customerId, $fieldsMapping, $storeId)
     {
         $config     = Mage::getModel('mailup/config');
         $xmlData    = '';
         $mappedData = array();
-        $subscriber = self::getCustomersData(array($customerId));
+        $subscriber = $this->getCustomersData(array($customerId));
 
         if (is_array($subscriber) && empty($subscriber)) {
             if ($config->isLogEnabled($storeId)) {
@@ -515,10 +515,10 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $subscriber = array_values($subscriber);
         $subscriber = $subscriber[0];
 
-        $subscriber["DataCarrelloAbbandonato"] = self::_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataCarrelloAbbandonato"]);
-        $subscriber["DataUltimoOrdineSpedito"] = self::_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataUltimoOrdineSpedito"]);
-        $subscriber["registeredDate"]          = self::_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["registeredDate"]);
-        $subscriber["DataUltimoOrdine"]        = self::_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataUltimoOrdine"]);
+        $subscriber["DataCarrelloAbbandonato"] = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataCarrelloAbbandonato"]);
+        $subscriber["DataUltimoOrdineSpedito"] = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataUltimoOrdineSpedito"]);
+        $subscriber["registeredDate"]          = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["registeredDate"]);
+        $subscriber["DataUltimoOrdine"]        = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataUltimoOrdine"]);
 
         /**
          * As mobileInputType = 2 we need this format: Prefix="+001" Number="8889624587"
@@ -686,9 +686,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         /**
          * Send the Data!
          */
-        // remove old static method
-        $helper     = Mage::helper('mailup');
-        $returnCode = $helper::generateAndSendCustomers($customers, $job, $storeId);
+        $returnCode = Mage::helper('mailup')->generateAndSendCustomers($customers, $job, $storeId);
         /**
          * Check return OK
          */
@@ -746,7 +744,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return  string
      */
-    private static function _formatPrice($price)
+    protected function _formatPrice($price)
     {
         return number_format($price, 2, ',', '');
     }
@@ -758,7 +756,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    private static function _retriveDateFromDatetime($datetime)
+    protected function _retriveDateFromDatetime($datetime)
     {
         if (empty($datetime)) return "";
 
@@ -772,7 +770,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return  string
      */
-    private static function _retriveDobFromDatetime($datetime)
+    protected function _retriveDobFromDatetime($datetime)
     {
         if (empty($datetime)) {
             return "";
@@ -781,7 +779,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         return date("d/m/Y", strtotime($datetime));
     }
 
-    public static function _convertUTCToStoreTimezone($datetime)
+    protected function _convertUTCToStoreTimezone($datetime)
     {
         if (empty($datetime)) return "";
 
@@ -795,10 +793,10 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         return $datetime;
     }
 
-    public static function _convertUTCToStoreTimezoneAndFormatForMailup($datetime)
+    protected function _convertUTCToStoreTimezoneAndFormatForMailup($datetime)
     {
         if (empty($datetime)) return "";
-        $datetime = self::_convertUTCToStoreTimezone($datetime);
+        $datetime = $this->_convertUTCToStoreTimezone($datetime);
 
         return date("d/m/Y", strtotime($datetime));
     }

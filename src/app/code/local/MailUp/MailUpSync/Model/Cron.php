@@ -109,9 +109,7 @@ class MailUp_MailUpSync_Model_Cron
                 /**
                  * Send the Data!
                  */
-                // remove old static method
-                $helper     = Mage::helper('mailup');
-                $returnCode = $helper::generateAndSendCustomers($customers, $job, $storeId);
+                $returnCode = Mage::helper('mailup')->generateAndSendCustomers($customers, $job, $storeId);
                 /**
                  * Check return OK
                  */
