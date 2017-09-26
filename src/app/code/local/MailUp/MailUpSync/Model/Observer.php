@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
 class MailUp_MailUpSync_Model_Observer
 {
     const CRON_STRING_PATH = 'crontab/jobs/mailup_mailupsync/schedule/cron_expr';

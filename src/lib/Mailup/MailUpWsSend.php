@@ -1,8 +1,10 @@
 <?php
 
 /**
+ * MailUp
  *
- * Moved from Model folder
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class Mailup_MailUpWsSend
 {

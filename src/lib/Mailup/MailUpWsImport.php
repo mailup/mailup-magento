@@ -1,6 +1,10 @@
 <?php
+
 /**
- * MailUpWsImport.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class Mailup_MailUpWsImport
 {

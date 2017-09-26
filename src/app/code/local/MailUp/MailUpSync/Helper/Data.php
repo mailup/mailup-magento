@@ -27,11 +27,6 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
     const MOBILE_INPUT_TYPE_SPLIT_INTL_CODE   = 2;
 
     /**
-     * split customers into batches
-     */
-    const BATCH_SIZE = 2000;
-
-    /**
      * Get the Customer Data
      *
      * @param   array
@@ -57,11 +52,9 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $thirtyDaysAgo   = date($dateFormat, Mage::getModel('core/date')->timestamp(time()) - 30 * 3600 * 24);
         $twelveMonthsAgo = date($dateFormat, Mage::getModel('core/date')->timestamp(time()) - 365 * 3600 * 24);
 
-        $parseSubscribers = false;
         $toSend           = array();
         if ($customerCollection === null) {
             $customerCollection = Mage::getModel('customer/customer')->getCollection();
-            $parseSubscribers   = true;
             if ($config->isLogEnabled()) {
                 $config->log('Parsing Subscribers, NULL collection passed.');
             }
@@ -485,16 +478,6 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         return (int)$startProcessesReturnCode;
     }
 
-    public function newImportProcess()
-    {
-
-    }
-
-    public function startImportProcess()
-    {
-
-    }
-
     /**
      * Get a single customers XML data.
      *
@@ -520,10 +503,18 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $subscriber = array_values($subscriber);
         $subscriber = $subscriber[0];
 
-        $subscriber["DataCarrelloAbbandonato"] = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataCarrelloAbbandonato"]);
-        $subscriber["DataUltimoOrdineSpedito"] = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataUltimoOrdineSpedito"]);
-        $subscriber["registeredDate"]          = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["registeredDate"]);
-        $subscriber["DataUltimoOrdine"]        = $this->_convertUTCToStoreTimezoneAndFormatForMailup($subscriber["DataUltimoOrdine"]);
+        $subscriber["DataCarrelloAbbandonato"] = $this->_convertUTCToStoreTimezoneAndFormatForMailup(
+            $subscriber["DataCarrelloAbbandonato"]
+        );
+        $subscriber["DataUltimoOrdineSpedito"] = $this->_convertUTCToStoreTimezoneAndFormatForMailup(
+            $subscriber["DataUltimoOrdineSpedito"]
+        );
+        $subscriber["registeredDate"]          = $this->_convertUTCToStoreTimezoneAndFormatForMailup(
+            $subscriber["registeredDate"]
+        );
+        $subscriber["DataUltimoOrdine"]        = $this->_convertUTCToStoreTimezoneAndFormatForMailup(
+            $subscriber["DataUltimoOrdine"]
+        );
 
         /**
          * As mobileInputType = 2 we need this format: Prefix="+001" Number="8889624587"
@@ -610,7 +601,6 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $custDataStr = implode("", $mappedData);
         // All field values are handled as strings, character '|' (pipe)
         // is not allowed and may lead to "-402" error codes
-        //$mappedData = str_replace('|', '', $mappedData);
         $xmlData .= $custDataStr;
         $xmlData .= "</subscriber>\n";
 
@@ -640,7 +630,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $jobModel                = Mage::getModel('mailup/job')->load($jobId);
 
         if (!$jobModel) {
-            throw new Mage_Exception('No Job Exists: '.$jobId);
+            throw Mage::exception('MailUp_MailUpSync', 'No Job Exists: '.$jobId);
         }
 
         $job     = $jobModel->getData();
@@ -717,7 +707,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 "UPDATE {$jobsTableName} SET status='queued' WHERE id={$job["id"]}"
             );
             if ($config->isLogEnabled()) {
-                $config->dbLog(sprintf("generateAndSendCustomers [ReturnCode] [ERROR] [%d]", $returnCode), $job["id"], $storeId);
+                $config->dbLog(
+                    sprintf("generateAndSendCustomers [ReturnCode] [ERROR] [%d]", $returnCode),
+                    $job["id"],
+                    $storeId
+                );
             }
         }
     }

@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Sync.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Block_Adminhtml_Sync extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
@@ -16,4 +19,5 @@ class MailUp_MailUpSync_Block_Adminhtml_Sync extends Mage_Adminhtml_Block_Widget
 
         $this->_removeButton('add');
     }
+
 }

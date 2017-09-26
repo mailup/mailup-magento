@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
+/**
  * Class MailUp_MailUpSync_Model_Adminhtml_System_Source_Fields
  *
  * Cached MailUp recipient fields fetched via API
@@ -47,7 +53,6 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Source_Fields
         } else {
             $storeId = null;
             $cacheId = 'mailup_fields_array';
-            //$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
         }
 
         // Blank option
@@ -66,7 +71,7 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Source_Fields
                     foreach ($wsFields as $label => $value) {
                         $options[] = array(
                             'value' => $value,
-                            'label' => $label, //Mage::helper('adminhtml')->__($label)
+                            'label' => $label,
                         );
                     }
                 }

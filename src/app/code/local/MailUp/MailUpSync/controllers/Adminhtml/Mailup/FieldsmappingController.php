@@ -1,7 +1,10 @@
 <?php
 
 /**
- * @deprectiated
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Adminhtml_Mailup_FieldsMappingController extends Mage_Adminhtml_Controller_Action
 {

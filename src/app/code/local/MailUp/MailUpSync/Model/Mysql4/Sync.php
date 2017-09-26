@@ -1,6 +1,10 @@
 <?php
+
 /**
- * Job.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Model_Mysql4_Sync extends Mage_Core_Model_Mysql4_Abstract
 {
@@ -32,39 +36,4 @@ class MailUp_MailUpSync_Model_Mysql4_Sync extends Mage_Core_Model_Mysql4_Abstrac
 
         return $adapter->fetchOne($select, $bind);
     }
-    
-    
-    /**
-     * Load by unique Key
-     */
-    public function loadByUniqueKey()
-    {
-        //(`customer_id`,`entity`,`job_id`, `store_id`)
-        
-        
-    }
-    
-//    /**
-//     * Get product identifier by sku
-//     *
-//     * @param string $sku
-//     * @return int|false
-//     */
-//    public function getIdBySku($sku)
-//    {
-//        $adapter = $this->_getReadAdapter();
-//
-//        $select = $adapter->select()
-//            ->from('phpsolut_import')
-//            ->where('sku = :sku');
-//
-//        $bind = array(':sku' => (string)$sku);
-//
-//        return $adapter->fetchOne($select, $bind);
-//    }
-    
-    //return $this->_getReadAdapter()->fetchOne(
-    //         'select connect_id from '.$this->getMainTable().' where sku=?',
-   //          $sku
-    //     );
 }

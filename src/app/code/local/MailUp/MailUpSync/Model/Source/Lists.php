@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
 class MailUp_MailUpSync_Model_Source_Lists
 {
     /**
@@ -83,6 +89,7 @@ class MailUp_MailUpSync_Model_Source_Lists
                         foreach ($list->Groups->Group as $tmp) {
                             $groups[(string)$tmp["idGroup"]] = (string)$tmp["groupName"];
                         }
+
                         $selectLists[$count] = array(
                             'value'  => (string)$list['idList'],
                             'label'  => (string)$list['listName'],
@@ -93,7 +100,9 @@ class MailUp_MailUpSync_Model_Source_Lists
                     }
                 }
             } else {
-                if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId)) Mage::log('LoginFromId failed');
+                if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log', $storeId))
+                    Mage::log('LoginFromId failed');
+
                 $selectLists[0] = array('value' => 0, 'label' => $GLOBALS["__sl_mailup_login_error"]);
             }
         }

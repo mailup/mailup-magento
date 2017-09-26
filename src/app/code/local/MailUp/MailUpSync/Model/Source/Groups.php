@@ -1,10 +1,10 @@
 <?php
-/**
- * Groups
- */
 
 /**
- * Source for groups per list
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Model_Source_Groups
 {

@@ -26,13 +26,6 @@ class MailUp_MailUpSync_IndexController extends Mage_Core_Controller_Front_Actio
     {
     }
 
-    /**
-     * Clean the Resource Table.
-     */
-    public function cleanAction()
-    {
-    }
-
     public function showAction()
     {
     }

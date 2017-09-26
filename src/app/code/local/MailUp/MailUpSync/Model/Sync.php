@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
+
+/**
  * Sync.php
  *
  * @method  int     getStoreId()
@@ -34,12 +41,6 @@ class MailUp_MailUpSync_Model_Sync extends Mage_Core_Model_Abstract
             $jobId,
             $storeId
         );
-
-        /*return $this->_getResource()->getIdByUniqueKey(
-            $this->getCustomerId(), 
-            $this->getJobId(), 
-            $this->getStoreId()
-        );*/
     }
 
     /**
@@ -47,7 +48,6 @@ class MailUp_MailUpSync_Model_Sync extends Mage_Core_Model_Abstract
      */
     public function loadByUniqueKey()
     {
-        //(`customer_id`,`entity`,`job_id`, `store_id`)
         return $this->_getResource()->loadByUniqueKey();
     }
 
@@ -78,24 +78,18 @@ class MailUp_MailUpSync_Model_Sync extends Mage_Core_Model_Abstract
      */
     public function getSyncItemsCollection()
     {
-//        SELECT ms.*, ce.email FROM {$syncTableName} ms 
-//                JOIN $customer_entity_table_name ce 
-//                    ON (ms.customer_id = ce.entity_id) 
-//                WHERE 
-//                ms.needs_sync=1 
-//                AND ms.entity='customer' 
-//                AND job_id=0"
-
         $customerEntityTable = Mage::getSingleton('core/resource')->getTableName('customer_entity');
-        //$customerEntityTable = $this->getTable('customer/entity');
-        $collection = $this->getCollection();
-        /* @var $collection MailUp_MailUpSync_Model_Mysql4_Sync_Collection */
+        $collection          = $this->getCollection();
 
         $collection
             ->addFieldToSelect('*')
             ->addFieldToFilter('job_id', array('eq' => 0))
             ->addFieldToFilter('needs_sync', array('eq' => 1))
-            ->getSelect()->join($customerEntityTable, "main_table.customer_id = {$customerEntityTable}.entity_id", "email");
+            ->getSelect()->join(
+                $customerEntityTable,
+                "main_table.customer_id = {$customerEntityTable}.entity_id",
+                "email"
+            );
 
         return $collection;
     }
@@ -103,11 +97,12 @@ class MailUp_MailUpSync_Model_Sync extends Mage_Core_Model_Abstract
     /**
      * Get Sync entries for a particular job.
      *
+     * @param   $jobId
+     *
      * @return  MailUp_MailUpSync_Model_Mysql4_Sync_Collection
      */
     public function fetchByJobId($jobId)
     {
-        //return $this->_getResource()->fetchByJobId($jobId);
         return $this->getCollection()
                     ->addFieldToSelect('*')
                     ->addFieldToFilter('job_id', array('eq' => $jobId));

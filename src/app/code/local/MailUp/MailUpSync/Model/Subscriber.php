@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
+/**
  * Subscriber.php
  *
  * Override Magento subscriber to allow us to enable / disable the Notifications

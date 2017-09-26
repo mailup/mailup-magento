@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Config.php
+ * MailUp
  *
- * Central config model
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Model_Source_Store
 {

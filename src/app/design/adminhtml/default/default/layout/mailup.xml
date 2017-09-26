@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <layout>
-
     <adminhtml_mailup_mailupbackend_index>
         <reference name="content">
             <!--	  <block type="mailup/adminhtml_mailupbackend" name="mailupbackend" template="mailup/mailupbackend.phtml"/>-->
@@ -79,13 +78,5 @@
             <block type="adminhtml/template" name="mailupsysconfigjavascript" template="mailup/mailupsync/sysconfigjavascript.phtml" />
         </reference>
     </adminhtml_system_config_edit>
-
-
-    <!-- works but need a better image.. -->
-    <!--<default>
-        <reference name="head">
-			<action method="addCss"><stylesheet>mailup/mailupsync/mailup.css</stylesheet></action>
-		</reference>
-    </default>-->
 
 </layout>

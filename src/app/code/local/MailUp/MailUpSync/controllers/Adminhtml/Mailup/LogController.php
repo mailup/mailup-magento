@@ -1,7 +1,10 @@
 <?php
 
 /**
- * LogController.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Adminhtml_Mailup_LogController extends Mage_Adminhtml_Controller_Action
 {

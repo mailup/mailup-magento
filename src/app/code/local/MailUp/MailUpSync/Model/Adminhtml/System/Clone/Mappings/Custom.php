@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
+/**
  * Provide clone model that specifies custom customer attributes as prefixes to be
  * cloned from single original field
  *
@@ -20,7 +26,6 @@ class MailUp_MailUpSync_Model_Adminhtml_System_Clone_Mappings_Custom
 
         $prefixes = array();
         foreach ($customerAttributes as $attribute) {
-            /* @var $attribute Mage_Eav_Model_Entity_Attribute */
             $prefixes[] = array(
                 'field' => $attribute->getAttributeCode().'_',
                 'label' => $attribute->getFrontend()->getLabel(),

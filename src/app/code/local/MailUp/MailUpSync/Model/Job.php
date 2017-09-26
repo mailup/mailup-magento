@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
+/**
  * Mailupjob.php
  *
  * @method  int     getStoreId()
@@ -30,9 +36,6 @@ class MailUp_MailUpSync_Model_Job extends Mage_Core_Model_Abstract
     const TYPE_MANUAL_SYNC = 0;
     const TYPE_AUTO_SYNC   = 1;
 
-    /**
-     * Constructor
-     */
     protected function _construct()
     {
         parent::_construct();
@@ -124,7 +127,6 @@ class MailUp_MailUpSync_Model_Job extends Mage_Core_Model_Abstract
     public function fetchQueuedJobsCollection($type = null)
     {
         $collection = $this->getCollection();
-        /* @var $collection MailUp_MailUpSync_Model_Mysql4_Job_Collection */
         $collection
             ->addFieldToSelect('*')
             ->addFieldToFilter('status', array('eq' => self::STATUS_QUEUED));
@@ -146,7 +148,6 @@ class MailUp_MailUpSync_Model_Job extends Mage_Core_Model_Abstract
     public function fetchQueuedOrStartedJobsCollection($type = null)
     {
         $collection = $this->getCollection();
-        /* @var $collection MailUp_MailUpSync_Model_Mysql4_Job_Collection */
         $collection
             ->addFieldToSelect('*')
             ->addFieldToFilter('status', array('in' => array(self::STATUS_QUEUED, self::STATUS_STARTED)));
@@ -187,7 +188,6 @@ class MailUp_MailUpSync_Model_Job extends Mage_Core_Model_Abstract
     {
         $jobTasks = Mage::getModel('mailup/sync');
 
-        /* @var $jobTasks MailUp_MailUpSync_Model_Sync */
         return $jobTasks->fetchByJobId($this->getId());
     }
 

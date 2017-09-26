@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
+/**
  * Moved from MailUp_MailUpSync_Model_Consoleurlvalidator
  */
 class MailUp_MailUpSync_Model_Adminhtml_System_Config_Consoleurlvalidator extends Mage_Core_Model_Config_Data

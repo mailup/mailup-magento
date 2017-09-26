@@ -1,18 +1,16 @@
 <?php
 
 /**
- * Self-test button for connection details in system configuration
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ *
+ * Test connection button on system configuration section
  */
 class MailUp_MailUpSync_Block_Adminhtml_System_Config_Form_Testbutton
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
-    /**
-     * Return element html
-     *
-     * @param  Varien_Data_Form_Element_Abstract $element
-     *
-     * @return string
-     */
     protected function _getElementHtml()
     {
         return $this->_toHtml();
@@ -36,4 +34,5 @@ class MailUp_MailUpSync_Block_Adminhtml_System_Config_Form_Testbutton
 
         return $button->toHtml();
     }
+
 }

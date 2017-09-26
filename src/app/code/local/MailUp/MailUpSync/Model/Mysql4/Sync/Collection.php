@@ -1,6 +1,10 @@
 <?php
+
 /**
- * Collection.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Model_Mysql4_Sync_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
 {

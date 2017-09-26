@@ -1,7 +1,10 @@
 <?php
 
 /**
- * FilterController.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml_Controller_Action
 {
@@ -209,7 +212,6 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $helper         = Mage::helper('mailup');
         $totalCustomers = count($mailupCustomerIds);
         $batches        = array_chunk($mailupCustomerIds, self::BATCH_SIZE);
-        //$totalBatches = count($customerIdBatches);
         if ($totalCustomers > self::BATCH_SIZE) {
             $this->_config()->dbLog("Batching Customers [{$totalCustomers}] CHUNKS [".self::BATCH_SIZE."]", 0, $storeId);
         }
@@ -399,11 +401,8 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             $lastTimeObject = clone $dateTime;
             if ($dateTime) {
                 $dateTime->modify('+30 minutes');
-                $now = new DateTime();
-                //if($dateTime < $now) {
                 Mage::getSingleton("adminhtml/session")
                     ->addNotice($this->__("Last Sync Performed: {$lastTimeObject->format('Y-m-d H:i:s e')}"));
-                //}
             }
         }
 

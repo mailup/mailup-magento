@@ -1,10 +1,13 @@
 <?php
 
+/**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
 class MailUp_MailUpSync_Adminhtml_Mailup_SyncController extends Mage_Adminhtml_Controller_Action
 {
-    /**
-     * Default Action
-     */
     public function indexAction()
     {
         $this->loadLayout();

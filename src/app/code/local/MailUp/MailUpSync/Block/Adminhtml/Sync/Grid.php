@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Grid.php
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Block_Adminhtml_Sync_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         parent::__construct();

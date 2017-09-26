@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Cron.php
+ * MailUp
  *
- * Scheduled Task handler.
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Model_Cron
 {
@@ -60,7 +61,11 @@ class MailUp_MailUpSync_Model_Cron
 
                 // If job is auto-sync and cron is not enabled for the job's site, skip the job
                 if ($jobModel->isAutoSync() && !$this->_config()->isCronExportEnabled($storeId)) {
-                    $this->_config()->dbLog("Auto-Task skipped as auto-sync disabled for site", $job["id"], $storeId);
+                    $this->_config()->dbLog(
+                        "Auto-Task skipped as auto-sync disabled for site",
+                        $job["id"],
+                        $storeId
+                    );
                     continue;
                 }
 
@@ -120,10 +125,16 @@ class MailUp_MailUpSync_Model_Cron
                         WHERE job_id = {$job["id"]}
                         AND entity='customer'"
                     );
-                    $this->_config()->dbLog("Job Task [update] [Synced] [customer count:{$customerCount}]", $job["id"], $storeId);
+                    $this->_config()->dbLog(
+                        "Job Task [update] [Synced] [customer count:{$customerCount}]",
+                        $job["id"],
+                        $storeId
+                    );
                     // finishing the job also
                     $dbWrite->query(
-                        "UPDATE {$jobsTableName} SET status='finished', finish_datetime='".gmdate("Y-m-d H:i:s")."'
+                        "UPDATE {$jobsTableName} 
+                        SET status='finished', 
+                        finish_datetime='".gmdate("Y-m-d H:i:s")."'
                         WHERE id={$job["id"]}"
                     );
                     $this->_config()->dbLog("Jobs [Update] [Complete] [{$job["id"]}]", $job["id"], $storeId);

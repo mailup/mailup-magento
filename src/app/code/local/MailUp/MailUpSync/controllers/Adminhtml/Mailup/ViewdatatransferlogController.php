@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
 class MailUp_MailUpSync_Adminhtml_Mailup_ViewdatatransferlogController extends Mage_Adminhtml_Controller_Action
 {
     public function indexAction()

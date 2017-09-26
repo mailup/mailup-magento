@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Filters.php
+ * MailUp
  *
- * Adminhtml block for the filters section
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Block_Filters extends Mage_Core_Block_Template
 {
@@ -18,4 +19,5 @@ class MailUp_MailUpSync_Block_Filters extends Mage_Core_Block_Template
 
         return $config->getStoreArray();
     }
+
 }

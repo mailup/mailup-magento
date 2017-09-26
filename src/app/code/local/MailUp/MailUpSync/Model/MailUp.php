@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
 class MailUp_MailUpSync_Model_MailUp extends Mage_Core_Model_Abstract
 {
     public function _construct()

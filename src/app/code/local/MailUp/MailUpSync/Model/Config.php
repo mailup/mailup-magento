@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Config.php
+ * MailUp
  *
- * Central config model
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Model_Config
 {
@@ -118,7 +119,6 @@ class MailUp_MailUpSync_Model_Config
         }
 
         $log = Mage::getModel('mailup/log');
-        /* @var $log MailUp_MailUpSync_Model_Log */
         $log->setData(
             array(
                 'store_id'   => $storeId,

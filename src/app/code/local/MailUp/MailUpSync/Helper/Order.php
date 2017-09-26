@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Order helper methods for MailUp
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
  */
 class MailUp_MailUpSync_Helper_Order extends Mage_Core_Helper_Abstract
 {

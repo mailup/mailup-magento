@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * MailUp
+ *
+ * @category    Mailup
+ * @package     Mailup_Sync
+ */
 class MailUp_MailUpSync_Model_Adminhtml_System_Source_Cron_Frequency
 {
     const HOURLY         = 0;
