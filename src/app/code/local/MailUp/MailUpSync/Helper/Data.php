@@ -60,9 +60,6 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $parseSubscribers = false;
         $toSend           = array();
         if ($customerCollection === null) {
-            /**
-             * @todo    Change to only load form current store/website
-             */
             $customerCollection = Mage::getModel('customer/customer')->getCollection();
             $parseSubscribers   = true;
             if ($config->isLogEnabled()) {
@@ -90,7 +87,6 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             $i        = $customer->getEmail();
 
             // Get order dates, numbers and totals for the current customer
-            //TODO: This would be more efficient with just a few SQL statements to gather this
             $allOrdersTotalAmount     = 0;
             $allOrdersDateTimes       = array();
             $allOrdersTotals          = array();
@@ -175,7 +171,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                         $config->log('Customer with id '.$currentCustomerId.' has abandoned cart');
                     }
 
-                    $datetimeCart = $lastCart->getUpdatedAt();
+                    $datetimeCart                            = $lastCart->getUpdatedAt();
                     $toSend[$i]['TotaleCarrelloAbbandonato'] = $this->_formatPrice($lastCart->getSubtotal());
                     $toSend[$i]['DataCarrelloAbbandonato']   = $this->_retriveDateFromDatetime($datetimeCart);
                     $toSend[$i]['IDCarrelloAbbandonato']     = $lastCart->getId();
@@ -397,7 +393,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         $xmlData           = '';
         $subscriberCounter = 0;
-        //$totalCustomers    = count($mailupCustomerIds);
+
         foreach ($mailupCustomerIds as $customerId) {
             $subscriberCounter++;
             $xmlCurrentCust = $this->_getCustomerXml($customerId, $fieldsMapping, $storeId);
@@ -416,6 +412,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 Mage::log('ImportProcessData');
                 Mage::log($importProcessData, 0);
             }
+
             $processID = $wsImport->newImportProcess($importProcessData);
             /**
              * Failure
@@ -471,9 +468,17 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($config->isLogEnabled($storeId)) {
             if ($startProcessesReturnCode < 0) {
-                $config->dbLog(sprintf("StartImportProcesses [ReturnCode] [ERROR] [%d]", $startProcessesReturnCode), $jobId, $storeId);
+                $config->dbLog(
+                    sprintf("StartImportProcesses [ReturnCode] [ERROR] [%d]", $startProcessesReturnCode),
+                    $jobId,
+                    $storeId
+                );
             } else {
-                $config->dbLog(sprintf("StartImportProcesses [ReturnCode] [SUCCESS] [%d]", $startProcessesReturnCode), $jobId, $storeId);
+                $config->dbLog(
+                    sprintf("StartImportProcesses [ReturnCode] [SUCCESS] [%d]", $startProcessesReturnCode),
+                    $jobId,
+                    $storeId
+                );
             }
         }
 
