@@ -12,5 +12,6 @@ src/app/etc/modules/MailUp_MailUpSync.xml   app/etc/modules/MailUp_MailUpSync.xm
 src/app/locale/en_US/MailUp_MailUpSync.csv  app/locale/en_US/MailUp_MailUpSync.csv
 src/app/locale/it_IT/MailUp_MailUpSync.csv  app/locale/it_IT/MailUp_MailUpSync.csv
 src/js/mailup/admin.js  js/mailup/admin.js
+src/lib/Mailup  lib/Mailup
 src/skin/adminhtml/default/default/images/MailUp_300_200_transparent_small.png  skin/adminhtml/default/default/images/MailUp_300_200_transparent_small.png
 src/skin/adminhtml/default/default/mailup/mailupsync    skin/adminhtml/default/default/mailup/mailupsync
