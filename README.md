@@ -1,11 +1,12 @@
+[![stable version](https://img.shields.io/badge/stable%20version-2.8.0-green.svg?style=flat-square)](https://github.com/mailup/mailup-magento/releases/tag/2.8.0)
+[![develop](https://img.shields.io/badge/beta%20version-branch%20develop-oran.svg?style=flat-square)](https://github.com/mailup/mailup-magento/tree/develop)
+[![license](https://img.shields.io/badge/license-AFL-blue.svg?style=flat-square)](https://github.com/mailup/mailup-magento/blob/master/LICENSE.txt)
+
 MailUp_MailUpSync
 =================
 Official Magento 1 CE Extension.  
 MailUp is your complete email delivery solution. It combines strong campaign management features (multi-list platform, advanced segmentation, dynamic content, A/B testing, detailed statistics, etc.) 
 with automated messaging and a free SMTP relay service. It uses an innovative, flat-rate pricing policy that provides great flexibility and guarantees substantial savings over competing solutions.
-
-## Stable version
-2.8.0
 
 ## Magento version
 (tested)
