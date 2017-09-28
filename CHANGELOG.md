@@ -2,12 +2,23 @@ CHANGELOG
 =========
 (date follow ISO format - 06 is for June)
 
+## [2.8.0]
+
+### Changed
+- [fix] refactoring class with Magento Coding Standard
+- [imp] refactoring static class in Helper
+- [imp] remove unused class and files
+- [fix] remove "php include" and move the class in lib folder
+  * Mailup_MailUpWsImport
+  * Mailup_MailUpWsSend
+- [fix] polish class
+
 ## [2.7.7]
 
 ### Changed
 - add compatibility for php7 (thanks to [azambon](https://github.com/azambon))
 
-## 2.7.6
+## 2.7.6 - 11/09/2017
 - [fix] admin config | close save config only to mailup section
 - [fix] admin config | refactoring field check
 - [dev] admin config | add skip test console url option
