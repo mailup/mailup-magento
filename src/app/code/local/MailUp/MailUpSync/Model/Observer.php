@@ -330,12 +330,16 @@ class MailUp_MailUpSync_Model_Observer
                 $ws = "http://{$console}/frontend/Xmlunsubscribe.aspx";
             }
 
-            $clientIp = $_SERVER['HTTP_CLIENT_IP'] ? : ($_SERVER['HTTP_X_FORWARDE‌​D_FOR'] ? : $_SERVER['REMOTE_ADDR']);
-            $ws        .= "?ListGuid=".rawurlencode($listGUID);
-            $ws        .= "&List=".rawurlencode($listId);
-            $ws        .= "&Email=".rawurlencode($model->getEmail());
-            $ws        .= "&Confirm=".rawurlencode($confirm);
-            $ws        .= "&ipAddress=".rawurlencode($clientIp);
+            $ws .= "?ListGuid=".rawurlencode($listGUID);
+            $ws .= "&List=".rawurlencode($listId);
+            $ws .= "&Email=".rawurlencode($model->getEmail());
+            $ws .= "&Confirm=".rawurlencode($confirm);
+
+            $clientIp = "not set";
+            if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+                $clientIp = $_SERVER['HTTP_CLIENT_IP'] ? : ($_SERVER['HTTP_X_FORWARDE‌​D_FOR'] ? : $_SERVER['REMOTE_ADDR']);
+                $ws       .= "&ipAddress=".rawurlencode($clientIp);
+            }
 
             // If there is a default group defined, use it
             if ($defaultGroupId !== null) {
@@ -357,299 +361,308 @@ class MailUp_MailUpSync_Model_Observer
             Mage::logException($e);
         }
 
-        return $this;
+return $this;
+}
+
+/**
+ * Config Check
+ *
+ * @return type
+ */
+public
+function configCheck()
+{
+    $wsimport = new Mailup_MailUpWsImport();
+    $mapping  = $wsimport->getFieldsMapping();
+    if (empty($mapping)) {
+        $url     = Mage::getModel('adminhtml/url');
+        $url     = $url->getUrl("adminhtml/mailup_configuration");
+        $message = Mage::helper("mailup")->__('MailUp fields mapping is not complete');
+        $message = str_replace("href=''", "href='$url'", $message);
+        Mage::getSingleton('adminhtml/session')->addWarning($message);
+
+        return;
     }
+}
 
-    /**
-     * Config Check
-     *
-     * @return type
-     */
-    public function configCheck()
-    {
-        $wsimport = new Mailup_MailUpWsImport();
-        $mapping  = $wsimport->getFieldsMapping();
-        if (empty($mapping)) {
-            $url     = Mage::getModel('adminhtml/url');
-            $url     = $url->getUrl("adminhtml/mailup_configuration");
-            $message = Mage::helper("mailup")->__('MailUp fields mapping is not complete');
-            $message = str_replace("href=''", "href='$url'", $message);
-            Mage::getSingleton('adminhtml/session')->addWarning($message);
+/**
+ * Called on completion of an order (saved during one-page checkout)
+ * NOTE: If another checkout is used, this will not be called!
+ */
+public
+function onCheckoutSaveOrder()
+{
+    $orderId = Mage::getSingleton("checkout/session")->getLastRealOrderId();
+    $order   = Mage::getModel("sales/order")->loadByIncrementId($orderId);
 
-            return;
-        }
+    $this->clearAbandonment($order);
+    $this->subscribeDuringCheckout($order);
+}
+
+/**
+ * If customer already subscribed, or pending, then set abandoned cart details to null
+ *
+ * @param Mage_Sales_Model_Order $order
+ */
+public
+function clearAbandonment($order)
+{
+    // Get subscriber status
+    $email      = $order->getCustomerEmail();
+    $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
+    if ($subscriber === null) {
+        return;
     }
+    $status = $subscriber->getStatus();
 
-    /**
-     * Called on completion of an order (saved during one-page checkout)
-     * NOTE: If another checkout is used, this will not be called!
-     */
-    public function onCheckoutSaveOrder()
-    {
-        $orderId = Mage::getSingleton("checkout/session")->getLastRealOrderId();
-        $order    = Mage::getModel("sales/order")->loadByIncrementId($orderId);
-
-        $this->clearAbandonment($order);
-        $this->subscribeDuringCheckout($order);
+    // Check status and make API request to clear abandonment fields
+    if ($status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED ||
+        $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED
+    ) {
+        Mage::helper("mailup")->clearAbandonmentFields($email);
     }
+}
 
-    /**
-     * If customer already subscribed, or pending, then set abandoned cart details to null
-     *
-     * @param Mage_Sales_Model_Order $order
-     */
-    public function clearAbandonment($order)
-    {
-        // Get subscriber status
-        $email      = $order->getCustomerEmail();
-        $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
-        if ($subscriber === null) {
-            return;
-        }
-        $status = $subscriber->getStatus();
-
-        // Check status and make API request to clear abandonment fields
-        if ($status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED ||
-            $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED
-        ) {
-            Mage::helper("mailup")->clearAbandonmentFields($email);
-        }
-    }
-
-    /**
-     * Subscribe the user, during checkout.
-     *
-     * @param Mage_Sales_Model_Order $order
-     */
-    public function subscribeDuringCheckout($order)
-    {
-        // If subscription option chosen, then subscribe
-        if (isset($_REQUEST["mailup_subscribe2"]) && $_REQUEST["mailup_subscribe2"]) {
-            try {
-                Mage::getModel("newsletter/subscriber")->subscribe($order->getCustomerEmail());
-            } catch (Exception $e) {
-            }
-        }
-    }
-
-    /**
-     * @var bool
-     */
-    protected $_hasCustomerDataSynced = false;
-
-    /**
-     * Attach to sales_order_save_after event
-     *
-     * @see     sales_order_save_after
-     *
-     * @param   type $observer
-     */
-    public function prepareOrderForDataSync($observer)
-    {
-        if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
-            Mage::log("TRIGGERED prepareOrderForDataSync");
-        }
-
-        $order = $observer->getEvent()->getOrder();
-        /* @var $order Mage_Sales_Model_Order */
-        $customerId = $order->getCustomerId();
-        //$customer = Mage::getmodel('customer/customer')->load($customerId);
-        /* @var $customer Mage_Customer_Model_Customer */
-        if ($this->_hasCustomerDataSynced) {
-            return; // Don't bother if nothing has updated.
-        }
-
-        //$storeId = $customer->getStoreId(); // Is this always correct??
-        $storeId = $order->getStoreId();
-
-        if ($customerId) {
-            self::setCustomerForDataSync($customerId, $storeId);
-            $this->_hasCustomerDataSynced = true;
-        }
-    }
-
-    /**
-     * Attach to customer_save_after even
-     *
-     * Track if we've synced this run, only do it once.
-     * This event can be triggers 3+ times per run as the customer
-     * model is saved! we only want one Sync though.
-     *
-     * @todo         refactor
-     * @observes     customer_save_after
-     */
-    public function prepareCustomerForDataSync($observer)
-    {
-        if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
-            Mage::log("TRIGGERED prepareCustomerForDataSync");
-        }
-
-        $customer = $observer->getEvent()->getCustomer();
-        /* @var $customer Mage_Customer_Model_Customer */
-        if (!$customer->hasDataChanges() || $this->_hasCustomerDataSynced) {
-            return; // Don't bother if nothing has updated.
-        }
-
-        $customerId = $customer->getId();
-        $storeId    = $customer->getStoreId(); // Is this always correct??
-        /**
-         * Possibly getting issues here with store id not being right...
-         *
-         * @todo possible issue
-         *
-         * If the customer is saved, how do we know which store to sync with?
-         * he could possibly have made sales on multiple websites...
-         */
-        if ($customerId) {
-            self::setCustomerForDataSync($customerId, $storeId);
-            $this->_hasCustomerDataSynced = true;
-        }
-    }
-
-    /**
-     * Add customer data to sync table and creates job if required
-     *
-     * @param      $customerId
-     * @param null $storeId
-     *
-     * @return bool|null
-     * @throws Exception
-     */
-    private static function setCustomerForDataSync($customerId, $storeId = null)
-    {
-        if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
-            Mage::log("TRIGGERED setCustomerForDataSync [StoreID:{$storeId}]");
-        }
-
-        // If no storeId specified, use current store
-        if (!isset($storeId)) {
-            $storeId = Mage::app()->getStore()->getId();
-        }
-
-        if (!$customerId) {
-            return false;
-        }
-
-        $helper = Mage::helper('mailup');
-        /* @var $helper MailUp_MailUpSync_Helper_Data */
-        $config = Mage::getModel('mailup/config');
-        /* @var $config MailUp_MailUpSync_Model_Config */
-        $lists = Mage::getSingleton('mailup/source_lists');
-        /* @var $lists MailUp_MailUpSync_Model_Source_Lists */
-        $listID   = $config->getMailupListId($storeId);
-        $listGuid = $lists->getListGuid($listID, $storeId);
-        // If list is not available, then cancel sync
-        if ($listGuid === false) {
-            if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
-                Mage::log("Could not fetch valid list, so cancelling customer sync");
-            }
-
-            return false;
-        }
-
-        // If cron export is not enabled, skip data sync for this customer
-        if (!$config->isCronExportEnabled($storeId)) {
-            return null;
-        }
-
-        /* @var $job MailUp_MailUpSync_Model_Job */
-
-        /**
-         *  Only Sync if they are a subscriber (or are waiting for confirmation)!
-         */
-        if (!$helper->isSubscriberOrWaiting($customerId, $storeId)) {
-            return null;
-        }
-
-        // Set options for those already subscribed (not pending and no opt-in)
-        $data = array(
-            'mailupgroupid' => '',
-            'send_optin'    => 0,
-            'as_pending'    => 0,
-            'status'        => 'queued',
-            'store_id'      => $storeId,
-            'list_id'       => $listID,
-            'list_guid'     => $listGuid,
-        );
-        // Find a matching job if exists
-        $job = Mage::getModel('mailup/job');
-        self::loadMatchingJob($job, $data);
-        // If no matching job, set data on new one
-        if (!$job->getId()) {
-            $job->setData($data);
-            $job->setQueueDatetime(gmdate('Y-m-d H:i:s'));
-            $job->setAsAutoSync();
-        }
-
-        // Save new or existing job
+/**
+ * Subscribe the user, during checkout.
+ *
+ * @param Mage_Sales_Model_Order $order
+ */
+public
+function subscribeDuringCheckout($order)
+{
+    // If subscription option chosen, then subscribe
+    if (isset($_REQUEST["mailup_subscribe2"]) && $_REQUEST["mailup_subscribe2"]) {
         try {
-            $job->save();
-            $config->dbLog("Job [Insert] [Group:NO GROUP] ", $job->getId(), $storeId);
+            Mage::getModel("newsletter/subscriber")->subscribe($order->getCustomerEmail());
         } catch (Exception $e) {
-            $config->dbLog("Job [Insert] [FAILED] [NO GROUP] ", $job->getId(), $storeId);
-            $config->log($e);
-            throw $e;
         }
-
-        // Add task - do this whether or not job is new
-        try {
-            // Check if task already exists for this customer
-            $jobTask = Mage::getModel('mailup/sync');
-            if ($jobTask->getIdByUniqueKey($customerId, $job->getId(), $storeId) == null) {
-                // If task does not exist, create and save
-                /** @var $jobTask MailUp_MailUpSync_Model_Sync */
-                $jobTask->setData(
-                    array(
-                        'store_id'    => $storeId,
-                        'customer_id' => $customerId,
-                        'entity'      => 'customer',
-                        'job_id'      => $job->getId(),
-                        'needs_sync'  => true,
-                        'last_sync'   => null,
-                    )
-                );
-                $jobTask->save();
-                $config->dbLog("Sync [Insert] [customer] [{$customerId}]", $job->getId(), $storeId);
-            }
-        } catch (Exception $e) {
-            $config->dbLog("Sync [Insert] [customer] [FAILED] [{$customerId}]", $job->getId(), $storeId);
-            $config->log($e);
-            throw $e;
-        }
-
-        return true;
     }
+}
+
+/**
+ * @var bool
+ */
+protected
+$_hasCustomerDataSynced = false;
+
+/**
+ * Attach to sales_order_save_after event
+ *
+ * @see     sales_order_save_after
+ *
+ * @param   type $observer
+ */
+public
+function prepareOrderForDataSync($observer)
+{
+    if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+        Mage::log("TRIGGERED prepareOrderForDataSync");
+    }
+
+    $order = $observer->getEvent()->getOrder();
+    /* @var $order Mage_Sales_Model_Order */
+    $customerId = $order->getCustomerId();
+    //$customer = Mage::getmodel('customer/customer')->load($customerId);
+    /* @var $customer Mage_Customer_Model_Customer */
+    if ($this->_hasCustomerDataSynced) {
+        return; // Don't bother if nothing has updated.
+    }
+
+    //$storeId = $customer->getStoreId(); // Is this always correct??
+    $storeId = $order->getStoreId();
+
+    if ($customerId) {
+        self::setCustomerForDataSync($customerId, $storeId);
+        $this->_hasCustomerDataSynced = true;
+    }
+}
+
+/**
+ * Attach to customer_save_after even
+ *
+ * Track if we've synced this run, only do it once.
+ * This event can be triggers 3+ times per run as the customer
+ * model is saved! we only want one Sync though.
+ *
+ * @todo         refactor
+ * @observes     customer_save_after
+ */
+public
+function prepareCustomerForDataSync($observer)
+{
+    if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+        Mage::log("TRIGGERED prepareCustomerForDataSync");
+    }
+
+    $customer = $observer->getEvent()->getCustomer();
+    /* @var $customer Mage_Customer_Model_Customer */
+    if (!$customer->hasDataChanges() || $this->_hasCustomerDataSynced) {
+        return; // Don't bother if nothing has updated.
+    }
+
+    $customerId = $customer->getId();
+    $storeId    = $customer->getStoreId(); // Is this always correct??
+    /**
+     * Possibly getting issues here with store id not being right...
+     *
+     * @todo possible issue
+     *
+     * If the customer is saved, how do we know which store to sync with?
+     * he could possibly have made sales on multiple websites...
+     */
+    if ($customerId) {
+        self::setCustomerForDataSync($customerId, $storeId);
+        $this->_hasCustomerDataSynced = true;
+    }
+}
+
+/**
+ * Add customer data to sync table and creates job if required
+ *
+ * @param      $customerId
+ * @param null $storeId
+ *
+ * @return bool|null
+ * @throws Exception
+ */
+private
+static function setCustomerForDataSync($customerId, $storeId = null)
+{
+    if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+        Mage::log("TRIGGERED setCustomerForDataSync [StoreID:{$storeId}]");
+    }
+
+    // If no storeId specified, use current store
+    if (!isset($storeId)) {
+        $storeId = Mage::app()->getStore()->getId();
+    }
+
+    if (!$customerId) {
+        return false;
+    }
+
+    $helper = Mage::helper('mailup');
+    /* @var $helper MailUp_MailUpSync_Helper_Data */
+    $config = Mage::getModel('mailup/config');
+    /* @var $config MailUp_MailUpSync_Model_Config */
+    $lists = Mage::getSingleton('mailup/source_lists');
+    /* @var $lists MailUp_MailUpSync_Model_Source_Lists */
+    $listID   = $config->getMailupListId($storeId);
+    $listGuid = $lists->getListGuid($listID, $storeId);
+    // If list is not available, then cancel sync
+    if ($listGuid === false) {
+        if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_log')) {
+            Mage::log("Could not fetch valid list, so cancelling customer sync");
+        }
+
+        return false;
+    }
+
+    // If cron export is not enabled, skip data sync for this customer
+    if (!$config->isCronExportEnabled($storeId)) {
+        return null;
+    }
+
+    /* @var $job MailUp_MailUpSync_Model_Job */
 
     /**
-     * Load job that matches data, or leave job as is
-     *
-     * @param MailUp_MailUpSync_Model_Job $job
-     * @param array                       $data
+     *  Only Sync if they are a subscriber (or are waiting for confirmation)!
      */
-    static function loadMatchingJob(&$job, $data)
-    {
-        $collection = Mage::getModel('mailup/job')->getCollection();
-        foreach ($data as $key => $value) {
-            $collection->addFieldToFilter($key, $value);
-        }
-
-        if ($collection->getSize() == 0)
-            return;
-
-        $job = $collection->getFirstItem();
+    if (!$helper->isSubscriberOrWaiting($customerId, $storeId)) {
+        return null;
     }
 
-    /**
-     * Get the config
-     *
-     * @reutrn MailUp_MailUpSync_Model_Config
-     */
-    protected function _config()
-    {
-        if (null === $this->_config) {
-            $this->_config = Mage::getModel('mailup/config');
-        }
-
-        return $this->_config;
+    // Set options for those already subscribed (not pending and no opt-in)
+    $data = array(
+        'mailupgroupid' => '',
+        'send_optin'    => 0,
+        'as_pending'    => 0,
+        'status'        => 'queued',
+        'store_id'      => $storeId,
+        'list_id'       => $listID,
+        'list_guid'     => $listGuid,
+    );
+    // Find a matching job if exists
+    $job = Mage::getModel('mailup/job');
+    self::loadMatchingJob($job, $data);
+    // If no matching job, set data on new one
+    if (!$job->getId()) {
+        $job->setData($data);
+        $job->setQueueDatetime(gmdate('Y-m-d H:i:s'));
+        $job->setAsAutoSync();
     }
+
+    // Save new or existing job
+    try {
+        $job->save();
+        $config->dbLog("Job [Insert] [Group:NO GROUP] ", $job->getId(), $storeId);
+    } catch (Exception $e) {
+        $config->dbLog("Job [Insert] [FAILED] [NO GROUP] ", $job->getId(), $storeId);
+        $config->log($e);
+        throw $e;
+    }
+
+    // Add task - do this whether or not job is new
+    try {
+        // Check if task already exists for this customer
+        $jobTask = Mage::getModel('mailup/sync');
+        if ($jobTask->getIdByUniqueKey($customerId, $job->getId(), $storeId) == null) {
+            // If task does not exist, create and save
+            /** @var $jobTask MailUp_MailUpSync_Model_Sync */
+            $jobTask->setData(
+                array(
+                    'store_id'    => $storeId,
+                    'customer_id' => $customerId,
+                    'entity'      => 'customer',
+                    'job_id'      => $job->getId(),
+                    'needs_sync'  => true,
+                    'last_sync'   => null,
+                )
+            );
+            $jobTask->save();
+            $config->dbLog("Sync [Insert] [customer] [{$customerId}]", $job->getId(), $storeId);
+        }
+    } catch (Exception $e) {
+        $config->dbLog("Sync [Insert] [customer] [FAILED] [{$customerId}]", $job->getId(), $storeId);
+        $config->log($e);
+        throw $e;
+    }
+
+    return true;
+}
+
+/**
+ * Load job that matches data, or leave job as is
+ *
+ * @param MailUp_MailUpSync_Model_Job $job
+ * @param array                       $data
+ */
+static function loadMatchingJob(&$job, $data)
+{
+    $collection = Mage::getModel('mailup/job')->getCollection();
+    foreach ($data as $key => $value) {
+        $collection->addFieldToFilter($key, $value);
+    }
+
+    if ($collection->getSize() == 0)
+        return;
+
+    $job = $collection->getFirstItem();
+}
+
+/**
+ * Get the config
+ *
+ * @reutrn MailUp_MailUpSync_Model_Config
+ */
+protected
+function _config()
+{
+    if (null === $this->_config) {
+        $this->_config = Mage::getModel('mailup/config');
+    }
+
+    return $this->_config;
+}
 }

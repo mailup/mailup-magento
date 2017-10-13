@@ -82,7 +82,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_ConfigurationController extends Mage_Ad
 
         // Connect up the messages to be returned as ajax
         $renderedMessages = array();
-        if (empty($messages)) {
+        if (!empty($messages)) {
             foreach ($messages as $msg) {
                 $renderedMessages[] = '<li class="'.$msg['type'].'-msg"><ul><li>'.$msg['message'].'</li></ul></li>';
             }
