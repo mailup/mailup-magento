@@ -2,6 +2,11 @@ CHANGELOG
 =========
 (date follow ISO format - 06 is for June)
 
+## [2.7.7]
+
+### Changed
+- add compatibility for php7 (thanks to [azambon](https://github.com/azambon))
+
 ## 2.7.6
 - [fix] admin config | close save config only to mailup section
 - [fix] admin config | refactoring field check
