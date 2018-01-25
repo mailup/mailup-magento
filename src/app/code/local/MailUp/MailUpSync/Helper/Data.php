@@ -85,8 +85,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
             $allOrdersTotals          = array();
             $allOrdersIds             = array();
             $allProductsIds           = array();
-            $last30daysOrdersAmount   = 0;
-            $last12monthsOrdersAmount = 0;
+            $lastThirtyDaysOrdersAmount   = 0;
+            $lastTwelveMonthsOrdersAmount = 0;
             $lastShipmentOrderId      = null;
             $lastShipmentOrderDate    = null;
 
@@ -110,11 +110,11 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
 
                 $currentOrderCreationDate = $order->getCreatedAt();
                 if ($currentOrderCreationDate > $thirtyDaysAgo) {
-                    $last30daysOrdersAmount += $currentOrderTotal;
+                    $lastThirtyDaysOrdersAmount += $currentOrderTotal;
                 }
 
                 if ($currentOrderCreationDate > $twelveMonthsAgo) {
-                    $last12monthsOrdersAmount += $currentOrderTotal;
+                    $lastTwelveMonthsOrdersAmount += $currentOrderTotal;
                 }
 
                 $currentOrderTotal                   = $this->_formatPrice($currentOrderTotal);
@@ -134,8 +134,8 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
 
-            $toSend[$i]['TotaleFatturatoUltimi30gg']   = $this->_formatPrice($last30daysOrdersAmount);
-            $toSend[$i]['TotaleFatturatoUltimi12Mesi'] = $this->_formatPrice($last12monthsOrdersAmount);
+            $toSend[$i]['TotaleFatturatoUltimi30gg']   = $this->_formatPrice($lastThirtyDaysOrdersAmount);
+            $toSend[$i]['TotaleFatturatoUltimi12Mesi'] = $this->_formatPrice($lastTwelveMonthsOrdersAmount);
             $toSend[$i]['IDTuttiProdottiAcquistati']   = implode(',', $allProductsIds);
 
             ksort($allOrdersDateTimes);
@@ -605,7 +605,7 @@ class MailUp_MailUpSync_Helper_Data extends Mage_Core_Helper_Abstract
         $xmlData .= "</subscriber>\n";
 
         /**
-         * @todo REMOVE
+         * to do REMOVE
          */
         $config->log($xmlData);
 

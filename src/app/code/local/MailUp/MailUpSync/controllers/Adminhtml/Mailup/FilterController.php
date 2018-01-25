@@ -48,18 +48,20 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $config = Mage::getModel('mailup/config');
         //$subscriber = Mage::getModel('newsletter/subscriber');
 
-        $sendOptinEmail = isset($post['send_optin_email_to_new_subscribers']) && ($post['send_optin_email_to_new_subscribers'] == 1);
+        $sendOptinEmail = isset($post['send_optin_email_to_new_subscribers'])
+            && ($post['send_optin_email_to_new_subscribers'] == 1);
         // Only save message_id if passed and if opt_in is true
         $sendMessageId     = ($sendOptinEmail && isset($post['message_id'])) ? $post['message_id'] : null;
         $mailupCustomerIds = Mage::getSingleton('core/session')->getMailupCustomerIds();
         //$totalCustomers = count($mailupCustomerIds);
         $batches = $this->_getBatches($mailupCustomerIds, $storeId);
         //$totalBatches = count($customerIdBatches);
-        $db_write = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $dbWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         /**
          * Create a New Group on Mailup
          */
         $post["mailupNewGroupName"] = trim($post["mailupNewGroupName"]);
+
         if ($post["mailupNewGroup"] && strlen($post["mailupNewGroupName"])) {
 
             $wsImport              = new Mailup_MailUpWsImport($storeId);
@@ -110,9 +112,11 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                             'list_guid'      => $post['mailupListGUID'],
                         )
                     );
+
                     if ($sendMessageId) {
                         $job->setMessageId($sendMessageId);
                     }
+
                     try {
                         $job->save();
                         $config->dbLog(
@@ -130,9 +134,8 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                         $config->log($e);
                         throw $e;
                     }
-                    /**
-                     * Each Customer
-                     */
+
+                    // Each Customer
                     foreach ($customerIdArray as $customerId) {
                         $customerCount++;
                         //$customer = Mage::getModel('customer/customer');
@@ -150,17 +153,21 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
                             );
                             $jobTask->save();
                         } catch (Exception $e) {
-                            $config->dbLog("Job Task [Sync] [FAILED] [customer:{$customerId}] [Update]", $job->getId(), $storeId);
+                            $config->dbLog(
+                                "Job Task [Sync] [FAILED] [customer:{$customerId}] [Update]",
+                                $job->getId(), $storeId
+                            );
                             $config->log($e);
                         }
                     }
                 }
+
                 $config->dbLog("Job Task [Sync] [Customer Count:{$customerCount}]", $job->getId(), $storeId);
                 /**
                  * Insert a new scheduled Task for the job.
                  */
                 $cronDelay = (int)($batchNumber * 15) + 2;
-                $db_write->insert(
+                $dbWrite->insert(
                     Mage::getSingleton('core/resource')->getTableName('cron_schedule'), array(
                         "job_code"     => "mailup_mailupsync",
                         "status"       => "pending",
@@ -213,7 +220,11 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $totalCustomers = count($mailupCustomerIds);
         $batches        = array_chunk($mailupCustomerIds, self::BATCH_SIZE);
         if ($totalCustomers > self::BATCH_SIZE) {
-            $this->_config()->dbLog("Batching Customers [{$totalCustomers}] CHUNKS [".self::BATCH_SIZE."]", 0, $storeId);
+            $this->_config()->dbLog(
+                "Batching Customers [{$totalCustomers}] CHUNKS [".self::BATCH_SIZE."]",
+                0,
+                $storeId
+            );
         }
 
         $batchArray    = array();
@@ -231,7 +242,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             }
 
             /**
-             * @todo    only return segmented if both not empty.
+             * to do    only return segmented if both not empty.
              */
             $batchArray[] = array(
                 self::STATUS_SUBSCRIBED     => $subscribed,
@@ -264,7 +275,7 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
     /**
      * Generate CSV
      *
-     * @todo    include stores
+     * code needs to include stores
      */
     public function csvAction()
     {
@@ -280,8 +291,10 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
             //CSV Column names
             $file = '"Email","First Name","Last Name"';
             if (Mage::getStoreConfig('mailup_newsletter/mailup/enable_mailup_synchro') == 1) {
-                $file .= ',"Company","City","Province","Zip code","Region","Country code","Address","Fax","Phone","Customer id"';
-                $file .= ',"Last Order id","Last Order date","Last Order total","Last order product ids","Last order category ids"';
+                $file .= ',"Company","City","Province","Zip code","Region","Country code","Address","Fax","Phone",
+                "Customer id"';
+                $file .= ',"Last Order id","Last Order date","Last Order total","Last order product ids",
+                "Last order category ids"';
                 $file .= ',"Last sent order date","Last sent order id"';
                 $file .= ',"Last abandoned cart date","Last abandoned cart total","Last abandoned cart id"';
                 $file .= ',"Total orders amount","Last 12 months amount","Last 30 days amount","All products ids"';
@@ -299,32 +312,54 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
 
                         $synchroConfig = Mage::getStoreConfig('mailup_newsletter/mailup/enable_mailup_synchro') == 1;
 
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['azienda'])) ? $subscriber['azienda'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['città'])) ? $subscriber['città'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['provincia'])) ? $subscriber['provincia'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['azienda'])) ?
+                                $subscriber['azienda'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['città'])) ?
+                                $subscriber['città'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['provincia'])) ?
+                                $subscriber['provincia'] : '').'"';
                         $file .= ',"'.($synchroConfig && (!empty($subscriber['cap'])) ? $subscriber['cap'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['regione'])) ? $subscriber['regione'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['paese'])) ? $subscriber['paese'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['indirizzo'])) ? $subscriber['indirizzo'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['regione'])) ?
+                                $subscriber['regione'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['paese'])) ?
+                                $subscriber['paese'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['indirizzo'])) ?
+                                $subscriber['indirizzo'] : '').'"';
                         $file .= ',"'.($synchroConfig && (!empty($subscriber['fax'])) ? $subscriber['fax'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['telefono'])) ? $subscriber['telefono'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDCliente'])) ? $subscriber['IDCliente'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDUltimoOrdine'])) ? $subscriber['IDUltimoOrdine'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['DataUltimoOrdine'])) ? $subscriber['DataUltimoOrdine'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleUltimoOrdine'])) ? $subscriber['TotaleUltimoOrdine'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDProdottiUltimoOrdine'])) ? $subscriber['IDProdottiUltimoOrdine'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDCategorieUltimoOrdine'])) ? $subscriber['IDCategorieUltimoOrdine'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['DataUltimoOrdineSpedito'])) ? $subscriber['DataUltimoOrdineSpedito'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDUltimoOrdineSpedito'])) ? $subscriber['IDUltimoOrdineSpedito'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['telefono'])) ?
+                                $subscriber['telefono'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDCliente'])) ?
+                                $subscriber['IDCliente'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDUltimoOrdine'])) ?
+                                $subscriber['IDUltimoOrdine'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['DataUltimoOrdine'])) ?
+                                $subscriber['DataUltimoOrdine'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleUltimoOrdine'])) ?
+                                $subscriber['TotaleUltimoOrdine'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDProdottiUltimoOrdine'])) ?
+                                $subscriber['IDProdottiUltimoOrdine'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDCategorieUltimoOrdine'])) ?
+                                $subscriber['IDCategorieUltimoOrdine'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['DataUltimoOrdineSpedito'])) ?
+                                $subscriber['DataUltimoOrdineSpedito'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDUltimoOrdineSpedito'])) ?
+                                $subscriber['IDUltimoOrdineSpedito'] : '').'"';
 
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['DataCarrelloAbbandonato'])) ? $subscriber['DataCarrelloAbbandonato'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleCarrelloAbbandonato'])) ? $subscriber['TotaleCarrelloAbbandonato'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDCarrelloAbbandonato'])) ? $subscriber['IDCarrelloAbbandonato'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['DataCarrelloAbbandonato'])) ?
+                                $subscriber['DataCarrelloAbbandonato'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleCarrelloAbbandonato'])) ?
+                                $subscriber['TotaleCarrelloAbbandonato'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDCarrelloAbbandonato'])) ?
+                                $subscriber['IDCarrelloAbbandonato'] : '').'"';
 
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleFatturato'])) ? $subscriber['TotaleFatturato'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleFatturatoUltimi12Mesi'])) ? $subscriber['TotaleFatturatoUltimi12Mesi'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleFatturatoUltimi30gg'])) ? $subscriber['TotaleFatturatoUltimi30gg'] : '').'"';
-                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDTuttiProdottiAcquistati'])) ? $subscriber['IDTuttiProdottiAcquistati'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleFatturato'])) ?
+                                $subscriber['TotaleFatturato'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleFatturatoUltimi12Mesi'])) ?
+                                $subscriber['TotaleFatturatoUltimi12Mesi'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['TotaleFatturatoUltimi30gg'])) ?
+                                $subscriber['TotaleFatturatoUltimi30gg'] : '').'"';
+                        $file .= ',"'.($synchroConfig && (!empty($subscriber['IDTuttiProdottiAcquistati'])) ?
+                                $subscriber['IDTuttiProdottiAcquistati'] : '').'"';
                         $file .= ';';
 
                         continue 2;
@@ -348,11 +383,11 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $this->checkRunningImport();
         try {
             $post        = $this->getRequest()->getPost();
-            $filter_name = $post['filter_name'];
+            $filterName = $post['filter_name'];
             unset($post['filter_name']);
 
             $wsImport = new Mailup_MailUpWsImport();
-            $wsImport->saveFilterHint($filter_name, $post);
+            $wsImport->saveFilterHint($filterName, $post);
         } catch (Exception $e) {
             $errorMessage = $this->__('Error: unable to save current filter');
             Mage::getSingleton('adminhtml/session')->addError($errorMessage);
@@ -392,10 +427,10 @@ class MailUp_MailUpSync_Adminhtml_Mailup_FilterController extends Mage_Adminhtml
         $cronScheduleTable = Mage::getSingleton("core/resource")->getTableName("cron_schedule");
 
         /**
-         * @todo    check if a cron has been run in the past X minites
-         *          notify if cron is npt up and running
+         * to do check if a cron has been run in the past X minites
+         * notify if cron is npt up and running
          */
-        $lastTime = $db->fetchOne("SELECT max(last_sync) FROM {$syncTableName}"); // 2013-04-18 19:23:55
+        $lastTime = $db->fetchOne("SELECT max(last_sync) FROM {$syncTableName}"); // forma example 2013-04-18 19:23:55
         if (!empty($lastTime)) {
             $dateTime       = \DateTime::createFromFormat('Y-m-d H:i:s', $lastTime);
             $lastTimeObject = clone $dateTime;

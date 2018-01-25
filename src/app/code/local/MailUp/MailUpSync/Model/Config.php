@@ -288,15 +288,6 @@ class MailUp_MailUpSync_Model_Config
         }
 
         return array_merge($mappingMain, $mappingCustom);
-
-        /*$return = array();
-        
-        foreach(Mage::getStoreConfig(self::XML_MAPPING_SECTION, $storeId) as $key => $field) {
-            var_dump($key);
-            var_dump($field);
-        }
-        
-        return $return;*/
     }
 
     /**
@@ -330,23 +321,12 @@ class MailUp_MailUpSync_Model_Config
      */
     public function getStoreArray()
     {
-        //$storeModel = Mage::getSingleton('adminhtml/system_store');
-        //$websiteCollection = $storeModel->getWebsiteCollection();
-        //$groupCollection = $storeModel->getGroupCollection();
-        //$storeCollection = $storeModel->getStoreCollection();
-        $storesArr = array();
-
-        /*$defaultStoreId = Mage::app()->getDefaultStoreView()->getStoreId();
-        $storesArr[$defaultStoreId] = array(
-            'id'    => $defaultStoreId,
-            'code'  => Mage::app()->getDefaultStoreView()->getCode(),
-            'name'  => Mage::app()->getDefaultStoreView()->getName(),
-        );*/
-
-        $storesArr[0] = array(
-            'id'   => 0,
-            'code' => 'default',
-            'name' => 'Default',
+        $storesArr = array(
+            array(
+                'id'   => 0,
+                'code' => 'default',
+                'name' => 'Default'
+            )
         );
 
         foreach (Mage::app()->getWebsites() as $website) {

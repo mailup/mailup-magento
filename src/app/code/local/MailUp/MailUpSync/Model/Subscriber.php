@@ -16,8 +16,9 @@ class MailUp_MailUpSync_Model_Subscriber extends Mage_Newsletter_Model_Subscribe
     /**
      * Send Success Email
      *
+     * make this per store scope
+     *
      * @override
-     * @todo    make this per store scope!
      * @return  MailUp_MailUpSync_Model_Subscriber
      */
     public function sendConfirmationSuccessEmail()
@@ -34,8 +35,9 @@ class MailUp_MailUpSync_Model_Subscriber extends Mage_Newsletter_Model_Subscribe
     /**
      * Send Confirmation request Email
      *
+     * make this per store scope
+     *
      * @override
-     * @todo    make this per store scope!
      * @return  MailUp_MailUpSync_Model_Subscriber
      */
     public function sendConfirmationRequestEmail()
@@ -52,8 +54,9 @@ class MailUp_MailUpSync_Model_Subscriber extends Mage_Newsletter_Model_Subscribe
     /**
      * Send the Emails
      *
+     * make this per store scope
+     *
      * @override
-     * @todo    make this per store scope!
      * @return  MailUp_MailUpSync_Model_Subscriber
      */
     public function sendUnsubscriptionEmail()

@@ -9,6 +9,10 @@
 class MailUp_MailUpSync_Model_Cron
 {
     const LOCK_INDEX_ID = "mailupcronrun";
+    /**
+     * @var MailUp_MailUpSync_Model_Config
+     */
+    protected $_config;
 
     /**
      * Run the Task
@@ -146,7 +150,11 @@ class MailUp_MailUpSync_Model_Cron
                         "UPDATE {$jobsTableName} SET status='queued' WHERE id={$job["id"]}"
                     );
                     if ($this->_config()->isLogEnabled()) {
-                        $this->_config()->dbLog(sprintf("generateAndSendCustomers [ReturnCode] [ERROR] [%d]", $returnCode), $job["id"], $storeId);
+                        $this->_config()->dbLog(
+                            sprintf("generateAndSendCustomers [ReturnCode] [ERROR] [%d]", $returnCode),
+                            $job["id"],
+                            $storeId
+                        );
                     }
                 }
             }
@@ -189,76 +197,78 @@ class MailUp_MailUpSync_Model_Cron
 
     /**
      * Run Auto Sync Jobs
+     *
+     * never implemented
      */
-    public function autoSync()
-    {
-        // Only run Auto Sync Jobs
-        $job = Mage::getModel('mailup/job');
-        /* @var $job MailUp_MailUpSync_Model_Job */
-
-        foreach ($job->fetchAutoSyncQueuedJobsCollection() as $job) {
-
-        }
-    }
+    //public function autoSync()
+    //{
+    //    // Only run Auto Sync Jobs
+    //    $job = Mage::getModel('mailup/job');
+    //    /* @var $job MailUp_MailUpSync_Model_Job */
+    //
+    //    foreach ($job->fetchAutoSyncQueuedJobsCollection() as $job) {
+    //
+    //    }
+    //}
 
     /**
      * Run Manual Sync Jobs
+     *
+     * never implemented
      */
-    public function manualSync()
-    {
-        // Only run Auto Sync Jobs
-
-        $job = Mage::getModel('mailup/job');
-        /* @var $job MailUp_MailUpSync_Model_Job */
-
-        foreach ($job->fetchManualSyncQueuedJobsCollection() as $job) {
-
-        }
-    }
+    //public function manualSync()
+    //{
+    //    // Only run Auto Sync Jobs
+    //    $job = Mage::getModel('mailup/job');
+    //    /* @var $job MailUp_MailUpSync_Model_Job */
+    //
+    //    foreach ($job->fetchManualSyncQueuedJobsCollection() as $job) {
+    //
+    //    }
+    //}
 
     /**
      * Start the next job in the Queue!
+     *
+     * never implemented
      */
-    public function startNextJob()
-    {
-        $jobModel = Mage::getModel('mailup/job');
-        /* @var $jobModel MailUp_MailUpSync_Model_Job */
-        foreach ($jobModel->fetchQueuedJobsCollection() as $job) {
-            /* @var $job MailUp_MailUpSync_Model_Job */
-
-            /**
-             * Try and Start it... if it fails, we can try the next one!
-             */
-        }
-    }
+    //public function startNextJob()
+    //{
+    //    $jobModel = Mage::getModel('mailup/job');
+    //    /* @var $jobModel MailUp_MailUpSync_Model_Job */
+    //    foreach ($jobModel->fetchQueuedJobsCollection() as $job) {
+    //        /* @var $job MailUp_MailUpSync_Model_Job */
+    //
+    //        /**
+    //         * Try and Start it... if it fails, we can try the next one!
+    //         */
+    //    }
+    //}
 
     /**
      * Add the jobs to the import queue on Mailup.
+     *
+     * never implemented
      */
-    public function newImportProcesses()
-    {
-
-    }
+    //public function newImportProcesses()
+    //{
+    //
+    //}
 
     /**
      * handle connection issues
      *
-     * @todo    implement
+     * never implemented
      */
-    public static function resendConnectionErrors()
-    {
-        // never implemented.
-    }
-
-    /**
-     * @var MailUp_MailUpSync_Model_Config
-     */
-    protected $_config;
+    //public static function resendConnectionErrors()
+    //{
+    //    // never implemented.
+    //}
 
     /**
      * Get the config
      *
-     * @reutrn MailUp_MailUpSync_Model_Config
+     * @return MailUp_MailUpSync_Model_Config
      */
     protected function _config()
     {

@@ -13,7 +13,7 @@
             </action>
         </reference>   
         <reference name="content">   
-            <block type="mailup/index" name="mailup_index" template="mailup/index.phtml"/>   
+            <block type="core/template" name="mailup_index" template="mailup/index.phtml"/>
         </reference>   
     </mailup_index_index>
 

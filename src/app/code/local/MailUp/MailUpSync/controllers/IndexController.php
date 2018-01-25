@@ -18,15 +18,4 @@ class MailUp_MailUpSync_IndexController extends Mage_Core_Controller_Front_Actio
 
         return $this;
     }
-
-    /**
-     * Default Action
-     */
-    public function indexAction()
-    {
-    }
-
-    public function showAction()
-    {
-    }
 }

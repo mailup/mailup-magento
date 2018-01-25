@@ -25,8 +25,7 @@ class MailUp_MailUpSync_Model_Mysql4_Sync extends Mage_Core_Model_Mysql4_Abstrac
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from($this->getMainTable())
-            ->where('customer_id = :customer_id AND job_id = :job_id AND store_id = :store_id')
-        ;
+            ->where('customer_id = :customer_id AND job_id = :job_id AND store_id = :store_id');
 
         $bind = array(
             ':customer_id'  => $customerId,

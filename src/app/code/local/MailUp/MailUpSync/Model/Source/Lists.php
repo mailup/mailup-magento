@@ -35,20 +35,23 @@ class MailUp_MailUpSync_Model_Source_Lists
         $storeCode   = Mage::app()->getRequest()->getParam('store');
 
         if (isset($storeId) && $storeId != false) {
-            $storeId = $storeId; // ?
+            $storeId = $storeId; // check why this
         } elseif ($storeCode) {
             $storeId = Mage::app()->getStore($storeCode)->getId();
-            $cacheId = 'mailup_fields_array_store_'.$storeId;
+            // Not used
+            // $cacheId = 'mailup_fields_array_store_'.$storeId;
         } elseif ($websiteCode) {
             $storeId = Mage::app()
                            ->getWebsite($websiteCode)
                            ->getDefaultGroup()
                            ->getDefaultStoreId();
-            $cacheId = 'mailup_fields_array_store_'.$storeId;
+            // Not used
+            // $cacheId = 'mailup_fields_array_store_'.$storeId;
         } else {
             $storeId = null;
-            $cacheId = 'mailup_fields_array';
-            //$storeId = Mage::app()->getDefaultStoreView()->getStoreId();
+            // Not used
+            // phpcs: ignore
+            // $cacheId = 'mailup_fields_array';
         }
 
         // Create select
