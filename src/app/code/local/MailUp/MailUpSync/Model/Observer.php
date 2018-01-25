@@ -70,7 +70,7 @@ class MailUp_MailUpSync_Model_Observer
             // Add messages from test
             if(count($messages) > 0) {
                 foreach($messages as $msg) {
-                    $msgObj = Mage::getSingleton('core/message')->$msg['type']($msg['message']);
+                    $msgObj = Mage::getSingleton('core/message')->{$msg['type']}($msg['message']);
                     Mage::getSingleton('adminhtml/session')->addMessage($msgObj);
                 }
             }
