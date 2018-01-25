@@ -1,10 +1,10 @@
 MailUp_MailUpSync
 =================
-Official Magento 1 CE Extension.<br />
+Official Magento 1 CE Extension.  
 MailUp is your complete email delivery solution. It combines strong campaign management features (multi-list platform, advanced segmentation, dynamic content, A/B testing, detailed statistics, etc.) with automated messaging and a free SMTP relay service. It uses an innovative, flat-rate pricing policy that provides great flexibility and guarantees substantial savings over competing solutions.
 
 ## Stable version
-2.7.6
+2.7.7
 
 ## Magento version
 (tested)
@@ -14,8 +14,8 @@ MailUp is your complete email delivery solution. It combines strong campaign man
 - CE 1.9.x (last version tested 1.9.3.3)
 
 ## PHP Version
-We only support php >=5.5.x  
-Actually we don't support php 7
+We only support php >=5.5.x    
+Actually we don't support php 7 but you can find some contribution from the community to make it possible.
 
 ## Install via
 - composer
