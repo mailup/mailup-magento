@@ -33,3 +33,6 @@ You can also open an issue to advice any kind of error.
 
 ### Privacy Policy
 Please look at [privacy_policy.md](privacy_policy.md)
+
+### Disclaimer
+Do not install the extension directly on production environment. Try before locally or in stage environment.  
