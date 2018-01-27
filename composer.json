@@ -1,7 +1,7 @@
 {
   "name": "mailup/magento",
   "type": "magento-module",
-  "license": "AFL",
+  "license": "AFL-3.0",
   "homepage": "https://github.com/mailup/mailup-magento",
   "description": "Magento 1.x CE Module for MailUp Integration",
   "authors": [
