@@ -8,6 +8,9 @@
  * Setup Ajax in system config for loading groups
  */
 function initListObserver(url) {
+    if ($('mailup_newsletter_mailup_list') == null) {
+        return;
+    }
     $('mailup_newsletter_mailup_list').observe('change', function (event) {
         var currentGroupSelected = $('mailup_newsletter_mailup_default_group').value;
         var updater = new Ajax.Updater('mailup_newsletter_mailup_default_group', url, {
@@ -21,6 +24,9 @@ function initListObserver(url) {
 }
 
 function initSelfTestObserver(url) {
+    if ($('mailup_selftest_button') == null) {
+        return;
+    }
     $('mailup_selftest_button').observe('click', function (event) {
         var request = new Ajax.Request(url, {
             method: 'get',
