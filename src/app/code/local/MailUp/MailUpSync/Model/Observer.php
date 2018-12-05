@@ -200,6 +200,10 @@ class MailUp_MailUpSync_Model_Observer
      */
     public function beforeSave($observer)
     {
+        if (isset($GLOBALS['__sl_mailup_save_from_webhook'])) {
+            return;
+        }
+
         $model = $observer->getEvent()->getDataObject();
 
         $confirm = Mage::getStoreConfig('mailup_newsletter/mailup/require_subscription_confirmation');
@@ -230,6 +234,10 @@ class MailUp_MailUpSync_Model_Observer
      */
 	public function sendUser($observer)
 	{
+        if (isset($GLOBALS['__sl_mailup_save_from_webhook'])) {
+            return $this;
+        }
+
         $model = $observer->getEvent()->getDataObject();
 
         // Ensure that (if called as singleton), this will only get called once per customer

@@ -42,7 +42,7 @@ class MailUp_MailUpSync_WebhookController extends Mage_Core_Controller_Front_Act
             die();
         }
 
-        $GLOBALS["__sl_mailup_invia_utente"] = 1; //avoids observer
+        $GLOBALS['__sl_mailup_save_from_webhook'] = 1; //avoids observer
         $model
             ->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED)
             ->save();
@@ -88,7 +88,7 @@ class MailUp_MailUpSync_WebhookController extends Mage_Core_Controller_Front_Act
             die();
         }
 
-        $GLOBALS["__sl_mailup_invia_utente"] = 1; //avoids observer
+        $GLOBALS['__sl_mailup_save_from_webhook'] = 1; //avoids observer
         $model
             ->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)
             ->save();
