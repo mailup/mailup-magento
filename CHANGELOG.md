@@ -2,6 +2,12 @@
 
 Changelog follow this format from 2.7.7 [Keep a changelog](http://keepachangelog.com/)
 
+## [2.7.8]
+
+### Fixes
+- Prevents JS errors in admin pages where Mailup elements are not visible (thanks to [azambon](https://github.com/azambon))
+- Prevents observer call when saving subscriber from webhook (thanks to [mmenozzi](https://github.com/mmenozzi)) 
+
 ## [2.7.7]
 
 ### Changed
