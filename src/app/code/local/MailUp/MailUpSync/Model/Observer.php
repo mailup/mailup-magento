@@ -169,18 +169,25 @@ class MailUp_MailUpSync_Model_Observer
                 // Ensure that before_save does not fire
                 $this->_authenticationCalled[$model->getEmail()] = true;
                 // Set subscription based on returned $stato_registrazione
-				switch (strtolower($stato_registrazione)) {
+                $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($model->getEmail());
+                switch (strtolower($stato_registrazione)) {
 					case "iscritto":
-						Mage::getModel('newsletter/subscriber')->loadByEmail($model->getEmail())->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED)->save();
+                        if ($subscriber && $subscriber->getId()) {
+                            $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED)->save();
+                        }
 						$model->setIsSubscribed(1);
 						$model->save();
 						break;
 					case "in attesa":
-                        Mage::getModel('newsletter/subscriber')->loadByEmail($model->getEmail())->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED)->save();
+                        if ($subscriber && $subscriber->getId()) {
+                            $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED)->save();
+                        }
 						Mage::getSingleton('core/session')->addNotice(Mage::helper("mailup")->__("Your subscription is waiting for confirmation"));
 						break;
 					default:
-						Mage::getModel('newsletter/subscriber')->loadByEmail($model->getEmail())->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+                        if ($subscriber && $subscriber->getId()) {
+                            $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+                        }
 						$model->setIsSubscribed(0);
 						$model->save();
 				}
