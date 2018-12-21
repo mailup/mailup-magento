@@ -2,6 +2,11 @@
 
 Changelog follow this format from 2.7.7 [Keep a changelog](http://keepachangelog.com/)
 
+## [2.7.9]
+
+### Fixes
+- Fixes creation of empty subscribers which happens in some situations (thanks to [mmenozzi](https://github.com/mmenozzi)) 
+
 ## [2.7.8]
 
 ### Fixes
