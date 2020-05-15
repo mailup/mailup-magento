@@ -100,7 +100,7 @@
                 <observers>
                     <mailup_observer>
                         <type>singleton</type>
-                        <class>MailUp_MailUpSync_Model_Observer</class>
+                        <class>mailup/observer</class>
                         <method>beforeSave</method>
                     </mailup_observer>
                 </observers>
@@ -109,7 +109,7 @@
 				<observers>
 					<mailupsenduser_observer>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>sendUser</method>
 					</mailupsenduser_observer>
 				</observers>
@@ -118,7 +118,7 @@
 				<observers>
 					<mailupleggiutente_observer>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>leggiUtente</method>
 					</mailupleggiutente_observer>
 				</observers>
@@ -127,7 +127,7 @@
 				<observers>
 					<mailupconfigsave_observer>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>saveSystemConfig</method>
 					</mailupconfigsave_observer>
 				</observers>
@@ -136,7 +136,7 @@
 				<observers>
 					<mailupconfigtest_observer>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>configCheck</method>
 					</mailupconfigtest_observer>
 				</observers>
@@ -145,7 +145,7 @@
 				<observers>
 					<mailup_subscribe_during_checkout>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>onCheckoutSaveOrder</method>
 					</mailup_subscribe_during_checkout>
 				</observers>
@@ -154,7 +154,7 @@
                 <observers>
                     <mailup_checkout_order_save>
                         <type>singleton</type>
-                        <class>MailUp_MailUpSync_Model_Observer</class>
+                        <class>mailup/observer</class>
                         <method>onCheckoutSaveOrder</method>
                     </mailup_checkout_order_save>
                 </observers>
@@ -163,7 +163,7 @@
 				<observers>
 					<mailup_checkout_order_save>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>prepareCustomerForDataSync</method>
 					</mailup_checkout_order_save>
 				</observers>
@@ -172,7 +172,7 @@
 				<observers>
 					<mailup_sales_order_save_after>
 						<type>singleton</type>
-						<class>MailUp_MailUpSync_Model_Observer</class>
+						<class>mailup/observer</class>
 						<method>prepareOrderForDataSync</method>
 					</mailup_sales_order_save_after>
 				</observers>
