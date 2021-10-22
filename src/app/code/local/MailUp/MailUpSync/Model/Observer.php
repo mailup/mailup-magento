@@ -178,7 +178,7 @@ class MailUp_MailUpSync_Model_Observer
 						$model->setIsSubscribed(1);
 						$model->save();
 						break;
-					case "in attesa":
+					case "disiscritto": // MailUp ReportByUser currently says "Disiscritto" for unconfirmed and "In Attesa" for unsubscribed...
                         if ($subscriber && $subscriber->getId()) {
                             $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED)->save();
                         }
