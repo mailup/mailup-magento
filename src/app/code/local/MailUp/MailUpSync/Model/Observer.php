@@ -132,6 +132,7 @@ class MailUp_MailUpSync_Model_Observer
 	public function leggiUtente($observer)
 	{
 		$model = $observer->getEvent()->getModel();
+		if (empty($model)) $model = $model = $observer->getEvent()->getCustomer();
 		if (empty($model)) $model = $model = $observer->getEvent()->getDataObject();
 		if (isset($GLOBALS["__sl_mailup_leggi_utente"])) return $this;
 		$GLOBALS["__sl_mailup_leggi_utente"] = true;

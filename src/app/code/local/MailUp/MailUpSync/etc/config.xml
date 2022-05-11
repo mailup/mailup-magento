@@ -114,7 +114,7 @@
 					</mailupsenduser_observer>
 				</observers>
 			</newsletter_subscriber_save_after>
-			<customer_customer_authenticated>
+			<customer_login>
 				<observers>
 					<mailupleggiutente_observer>
 						<type>singleton</type>
@@ -122,7 +122,7 @@
 						<method>leggiUtente</method>
 					</mailupleggiutente_observer>
 				</observers>
-			</customer_customer_authenticated>
+			</customer_login>
 			<controller_action_postdispatch_adminhtml_system_config_save>
 				<observers>
 					<mailupconfigsave_observer>
